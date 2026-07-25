@@ -1,0 +1,896 @@
+<?php
+/**
+ * @file
+ * Install/uninstall and update functions for the news distribution profile.
+ * ملف التثبيت الكامل لتوزيعة باك دروب الإخبارية
+ * Professional News Distribution for Backdrop CMS
+ */
+
+/**
+ * Implements hook_install().
+ * Perform actions to set up the site for this profile.
+ */
+function backdrop_news_install() {
+  // ================================
+  // 1. إعداد صيغ النصوص
+  // ================================
+  _backdrop_news_setup_text_formats();
+
+  // ================================
+  // 2. تعيين الثيم الافتراضي
+  // ================================
+  _backdrop_news_setup_themes();
+
+  // ================================
+  // 3. إنشاء أنواع المحتوى
+  // ================================
+  _backdrop_news_create_content_types();
+
+  // ================================
+  // 4. إنشاء الحقول المخصصة
+  // ================================
+  _backdrop_news_create_fields();
+
+  // ================================
+  // 5. إنشاء التصنيفات والوسوم
+  // ================================
+  _backdrop_news_create_taxonomies();
+
+  // ================================
+  // 6. إنشاء الأدوار والصلاحيات
+  // ================================
+  _backdrop_news_setup_roles_permissions();
+
+  // ================================
+  // 7. استيراد المحتوى الافتراضي
+  // ================================
+  _backdrop_news_import_default_content();
+
+  // ================================
+  // 8. إعدادات النظام
+  // ================================
+  _backdrop_news_setup_system_settings();
+
+  // ================================
+  // 9. تنظيف الـ Cache
+  // ================================
+  backdrop_flush_all_caches();
+}
+
+/**
+ * Setup text formats for the site.
+ */
+function _backdrop_news_setup_text_formats() {
+  // تنسيق النص الأساسي
+  $basic_format = array(
+    'format' => 'basic_html',
+    'name' => 'HTML أساسي',
+    'weight' => 0,
+    'editor' => 'ckeditor5',
+    'editor_settings' => array(
+      'image_upload' => array(
+        'status' => 1,
+        'dimensions' => array('max_width' => '', 'max_height' => ''),
+        'max_size' => NULL,
+        'scheme' => 'public',
+        'directory' => 'inline-images',
+      ),
+    ),
+    'filters' => array(
+      'filter_url' => array(
+        'weight' => 0,
+        'status' => 1,
+      ),
+      'filter_html' => array(
+        'weight' => 1,
+        'status' => 1,
+      ),
+      'filter_autop' => array(
+        'weight' => 2,
+        'status' => 1,
+      ),
+      'filter_image_caption' => array(
+        'weight' => 4,
+        'status' => 1,
+      ),
+      'filter_image_align' => array(
+        'weight' => 4,
+        'status' => 1,
+      ),
+      'filter_htmlcorrector' => array(
+        'weight' => 10,
+        'status' => 1,
+      ),
+    ),
+  );
+  $basic_format = (object) $basic_format;
+  filter_format_save($basic_format);
+
+  // تنسيق Raw HTML
+  $raw_html_format = array(
+    'format' => 'raw_html',
+    'name' => 'Raw HTML',
+    'weight' => 1,
+    'editor' => NULL,
+    'filters' => array(
+      'filter_url' => array(
+        'weight' => 0,
+        'status' => 1,
+      ),
+      'filter_autop' => array(
+        'weight' => 1,
+        'status' => 1,
+      ),
+      'filter_image_caption' => array(
+        'weight' => 4,
+        'status' => 1,
+      ),
+      'filter_image_align' => array(
+        'weight' => 4,
+        'status' => 1,
+      ),
+      'filter_htmlcorrector' => array(
+        'weight' => 10,
+        'status' => 1,
+      ),
+    ),
+  );
+  $raw_html_format = (object) $raw_html_format;
+  filter_format_save($raw_html_format);
+}
+
+/**
+ * Setup themes for the site.
+ */
+function _backdrop_news_setup_themes() {
+  // تفعيل ثيم Basis
+  $default_theme = 'basis';
+  config_set('system.core', 'theme_default', $default_theme);
+  theme_enable(array($default_theme));
+  theme_disable(array('stark'));
+
+  // تفعيل Admin Theme (Seven)
+  db_update('system')
+    ->fields(array('status' => 1))
+    ->condition('type', 'theme')
+    ->condition('name', 'seven')
+    ->execute();
+  config_set('system.core', 'admin_theme', 'seven');
+  config_set('system.core', 'node_admin_theme', '1');
+}
+
+/**
+ * Create content types for the news distribution.
+ */
+function _backdrop_news_create_content_types() {
+  $types = array(
+    array(
+      'type' => 'article',
+      'name' => st('مقالة إخبارية'),
+      'description' => st('أضف مقالة إخبارية جديدة إلى الموقع'),
+      'settings' => array(
+        'status_default' => NODE_PUBLISHED,
+        'promote_enabled' => TRUE,
+        'promote_default' => FALSE,
+        'sticky_enabled' => TRUE,
+        'sticky_default' => FALSE,
+        'node_preview' => TRUE,
+        'revision_enabled' => TRUE,
+        'revision_default' => FALSE,
+        'show_submitted_info' => TRUE,
+        'comment_enabled' => TRUE,
+        'comment_default' => COMMENT_NODE_OPEN,
+        'node_submitted' => TRUE,
+        'node_user_picture' => TRUE,
+        'menu_default' => TRUE,
+        'menu_options' => array('main-menu'),
+      ),
+      'is_new' => TRUE,
+    ),
+    array(
+      'type' => 'page',
+      'name' => st('صفحة ثابتة'),
+      'description' => st('صفحة ثابتة مثل من نحن أو تواصل معنا'),
+      'settings' => array(
+        'status_default' => NODE_PUBLISHED,
+        'promote_enabled' => FALSE,
+        'promote_default' => FALSE,
+        'sticky_enabled' => FALSE,
+        'sticky_default' => FALSE,
+        'node_preview' => TRUE,
+        'revision_enabled' => TRUE,
+        'revision_default' => FALSE,
+        'show_submitted_info' => FALSE,
+        'comment_enabled' => FALSE,
+        'comment_default' => COMMENT_NODE_CLOSED,
+        'node_submitted' => FALSE,
+        'node_user_picture' => FALSE,
+        'menu_default' => TRUE,
+        'menu_options' => array('main-menu'),
+      ),
+      'is_new' => TRUE,
+    ),
+    array(
+      'type' => 'video_news',
+      'name' => st('خبر فيديو'),
+      'description' => st('أضف خبراً مع مقطع فيديو'),
+      'settings' => array(
+        'status_default' => NODE_PUBLISHED,
+        'promote_enabled' => TRUE,
+        'promote_default' => FALSE,
+        'sticky_enabled' => TRUE,
+        'sticky_default' => FALSE,
+        'node_preview' => TRUE,
+        'revision_enabled' => TRUE,
+        'revision_default' => FALSE,
+        'show_submitted_info' => TRUE,
+        'comment_enabled' => TRUE,
+        'comment_default' => COMMENT_NODE_OPEN,
+        'node_submitted' => TRUE,
+        'node_user_picture' => TRUE,
+        'menu_default' => FALSE,
+        'menu_options' => array(),
+      ),
+      'is_new' => TRUE,
+    ),
+  );
+
+  foreach ($types as $type) {
+    $type = (object) $type;
+    node_type_save($type);
+    node_add_body_field($type);
+  }
+}
+
+/**
+ * Create custom fields for content types.
+ */
+function _backdrop_news_create_fields() {
+  // حقل الصورة الرئيسية
+  $field_image = array(
+    'field_name' => 'field_featured_image',
+    'type' => 'image',
+    'cardinality' => 1,
+    'locked' => FALSE,
+    'indexes' => array('fid' => array('fid')),
+    'settings' => array(
+      'uri_scheme' => 'public',
+      'default_image' => FALSE,
+    ),
+    'storage' => array(
+      'type' => 'field_sql_storage',
+      'settings' => array(),
+    ),
+  );
+  field_create_field($field_image);
+
+  // إضافة حقل الصورة إلى المقالات
+  $instance_article_image = array(
+    'field_name' => 'field_featured_image',
+    'entity_type' => 'node',
+    'label' => st('الصورة الرئيسية'),
+    'bundle' => 'article',
+    'description' => st('الصورة الرئيسية التي ستظهر مع المقالة'),
+    'required' => TRUE,
+    'settings' => array(
+      'file_directory' => 'articles/[node:created:custom:Y-m]',
+      'file_extensions' => 'png gif jpg jpeg',
+      'max_filesize' => '5 MB',
+      'max_resolution' => '1600x1200',
+      'min_resolution' => '800x600',
+      'alt_field' => TRUE,
+      'title_field' => FALSE,
+    ),
+    'widget' => array(
+      'type' => 'image_image',
+      'settings' => array(
+        'progress_indicator' => 'throbber',
+        'preview_image_style' => 'thumbnail',
+      ),
+      'weight' => 0,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'type' => 'image',
+        'settings' => array('image_style' => 'large', 'image_link' => ''),
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'hidden',
+        'type' => 'image',
+        'settings' => array(
+          'image_style' => 'medium',
+          'image_link' => 'content',
+        ),
+        'weight' => 0,
+      ),
+    ),
+  );
+  field_create_instance($instance_article_image);
+
+  // إضافة حقل الصورة إلى أخبار الفيديو
+  $instance_video_image = array(
+    'field_name' => 'field_featured_image',
+    'entity_type' => 'node',
+    'label' => st('الصورة الرئيسية'),
+    'bundle' => 'video_news',
+    'description' => st('صورة الغلاف للخبر الفيديو'),
+    'required' => TRUE,
+    'settings' => array(
+      'file_directory' => 'videos/[node:created:custom:Y-m]',
+      'file_extensions' => 'png gif jpg jpeg',
+      'max_filesize' => '5 MB',
+      'max_resolution' => '1600x1200',
+      'min_resolution' => '800x600',
+      'alt_field' => TRUE,
+      'title_field' => FALSE,
+    ),
+    'widget' => array(
+      'type' => 'image_image',
+      'settings' => array(
+        'progress_indicator' => 'throbber',
+        'preview_image_style' => 'thumbnail',
+      ),
+      'weight' => 0,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'type' => 'image',
+        'settings' => array('image_style' => 'large', 'image_link' => ''),
+        'weight' => 0,
+      ),
+    ),
+  );
+  field_create_instance($instance_video_image);
+
+  // حقل الملخص
+  $field_summary = array(
+    'field_name' => 'field_summary',
+    'type' => 'text_long',
+    'cardinality' => 1,
+    'settings' => array(),
+  );
+  field_create_field($field_summary);
+
+  // إضافة حقل الملخص إلى المقالات
+  $instance_article_summary = array(
+    'field_name' => 'field_summary',
+    'entity_type' => 'node',
+    'label' => st('الملخص'),
+    'bundle' => 'article',
+    'description' => st('ملخص قصير للمقالة يظهر في قائمة المقالات'),
+    'required' => TRUE,
+    'widget' => array(
+      'type' => 'text_textarea',
+      'rows' => 2,
+      'weight' => 1,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'hidden',
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
+    ),
+  );
+  field_create_instance($instance_article_summary);
+
+  // حقل خبر عاجل
+  $field_breaking = array(
+    'field_name' => 'field_breaking_news',
+    'type' => 'list_boolean',
+    'cardinality' => 1,
+    'settings' => array(
+      'allowed_values' => array(
+        0 => st('لا'),
+        1 => st('نعم'),
+      ),
+    ),
+  );
+  field_create_field($field_breaking);
+
+  // إضافة حقل خبر عاجل إلى المقالات
+  $instance_breaking = array(
+    'field_name' => 'field_breaking_news',
+    'entity_type' => 'node',
+    'label' => st('خبر عاجل'),
+    'bundle' => 'article',
+    'description' => st('حدد هذا إذا كانت المقالة خبراً عاجلاً'),
+    'required' => FALSE,
+    'widget' => array(
+      'type' => 'options_buttons',
+      'weight' => 2,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'type' => 'list_default',
+        'weight' => 2,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'type' => 'list_default',
+        'weight' => 2,
+      ),
+    ),
+  );
+  field_create_instance($instance_breaking);
+}
+
+/**
+ * Create taxonomies for categorizing content.
+ */
+function _backdrop_news_create_taxonomies() {
+  // إنشاء مفردات التصنيفات
+  $categories = new TaxonomyVocabulary(array(
+    'name' => st('التصنيفات'),
+    'description' => st('تصنيفات الأخبار الرئيسية'),
+    'machine_name' => 'categories',
+  ));
+  taxonomy_vocabulary_save($categories);
+
+  // إضافة مصطلحات التصنيفات
+  $category_terms = array(
+    'السياسة' => 'أخبار سياسية ودولية',
+    'الرياضة' => 'أخبار رياضية محلية وعالمية',
+    'التكنولوجيا' => 'أخبار وتطورات تقنية',
+    'الاقتصاد' => 'أخبار اقتصادية وأسواق',
+    'الثقافة' => 'أخبار ثقافية وفنية',
+    'الصحة' => 'أخبار صحية وطبية',
+  );
+
+  foreach ($category_terms as $name => $description) {
+    $term = new TaxonomyTerm(array(
+      'name' => st($name),
+      'description' => st($description),
+      'vocabulary' => $categories->machine_name,
+    ));
+    taxonomy_term_save($term);
+  }
+
+  // إنشاء حقل التصنيفات
+  $field_categories = array(
+    'field_name' => 'field_categories',
+    'type' => 'taxonomy_term_reference',
+    'cardinality' => 1,
+    'settings' => array(
+      'allowed_values' => array(
+        array(
+          'vocabulary' => 'categories',
+          'parent' => 0,
+        ),
+      ),
+    ),
+  );
+  field_create_field($field_categories);
+
+  // إضافة حقل التصنيفات إلى المقالات
+  $instance_categories = array(
+    'field_name' => 'field_categories',
+    'entity_type' => 'node',
+    'label' => st('التصنيف'),
+    'bundle' => 'article',
+    'description' => st('اختر التصنيف الرئيسي للمقالة'),
+    'required' => TRUE,
+    'widget' => array(
+      'type' => 'options_select',
+      'weight' => 3,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 3,
+      ),
+    ),
+  );
+  field_create_instance($instance_categories);
+
+  // إضافة حقل التصنيفات إلى أخبار الفيديو
+  $instance_video_categories = array(
+    'field_name' => 'field_categories',
+    'entity_type' => 'node',
+    'label' => st('التصنيف'),
+    'bundle' => 'video_news',
+    'description' => st('اختر التصنيف للخبر الفيديو'),
+    'required' => TRUE,
+    'widget' => array(
+      'type' => 'options_select',
+      'weight' => 3,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 3,
+      ),
+    ),
+  );
+  field_create_instance($instance_video_categories);
+
+  // إنشاء مفردات الوسوم
+  $tags = new TaxonomyVocabulary(array(
+    'name' => st('الوسوم'),
+    'description' => st('وسوم عامة لتصنيف المقالات'),
+    'machine_name' => 'tags',
+  ));
+  taxonomy_vocabulary_save($tags);
+
+  // إضافة مصطلحات الوسوم
+  $tag_terms = array(
+    'عاجل' => 'أخبار عاجلة ومستجدة',
+    'حصري' => 'أخبار حصرية',
+    'تحليل' => 'تحليلات صحفية معمقة',
+    'مقابلة' => 'مقابلات صحفية',
+    'تقرير' => 'تقارير شاملة',
+  );
+
+  foreach ($tag_terms as $name => $description) {
+    $term = new TaxonomyTerm(array(
+      'name' => st($name),
+      'description' => st($description),
+      'vocabulary' => 'tags',
+    ));
+    taxonomy_term_save($term);
+  }
+
+  // إنشاء حقل الوسوم
+  $field_tags = array(
+    'field_name' => 'field_tags',
+    'type' => 'taxonomy_term_reference',
+    'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+    'settings' => array(
+      'allowed_values' => array(
+        array(
+          'vocabulary' => 'tags',
+          'parent' => 0,
+        ),
+      ),
+    ),
+  );
+  field_create_field($field_tags);
+
+  // إضافة حقل الوسوم إلى المقالات
+  $instance_tags = array(
+    'field_name' => 'field_tags',
+    'entity_type' => 'node',
+    'label' => st('الوسوم'),
+    'bundle' => 'article',
+    'description' => st('أضف وسوماً لتصنيف المقالة'),
+    'required' => FALSE,
+    'widget' => array(
+      'type' => 'taxonomy_autocomplete',
+      'weight' => 4,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 4,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 4,
+      ),
+    ),
+  );
+  field_create_instance($instance_tags);
+}
+
+/**
+ * Setup user roles and permissions.
+ */
+function _backdrop_news_setup_roles_permissions() {
+  // إنشاء دور الصحفي
+  $journalist_role = new stdClass();
+  $journalist_role->name = 'journalist';
+  $journalist_role->label = 'صحفي';
+  $journalist_role->description = 'يمكنه إنشاء وتحرير مقالاته الخاصة';
+  $journalist_role->weight = 2;
+  user_role_save($journalist_role);
+
+  $journalist_permissions = array(
+    'access content',
+    'access comments',
+    'post comments',
+    'skip comment approval',
+    'create article content',
+    'edit own article content',
+    'view own unpublished content',
+    'upload editor images',
+    'access site in maintenance mode',
+    'access administration bar',
+    'access content overview',
+    'search content',
+    'use advanced search',
+    'access file overview',
+    'create files',
+    'view own files',
+    'view files',
+    'edit terms in tags',
+  );
+  user_role_grant_permissions('journalist', $journalist_permissions);
+
+  // إنشاء دور المحرر
+  $editor_role = new stdClass();
+  $editor_role->name = 'editor';
+  $editor_role->label = 'محرر';
+  $editor_role->description = 'يمكنه إدارة كل المقالات والنشر';
+  $editor_role->weight = 3;
+  user_role_save($editor_role);
+
+  $editor_permissions = array(
+    'access content',
+    'access comments',
+    'post comments',
+    'skip comment approval',
+    'create article content',
+    'edit own article content',
+    'edit any article content',
+    'delete own article content',
+    'delete any article content',
+    'create page content',
+    'edit own page content',
+    'edit any page content',
+    'delete own page content',
+    'delete any page content',
+    'create video_news content',
+    'edit own video_news content',
+    'edit any video_news content',
+    'delete own video_news content',
+    'delete any video_news content',
+    'view own unpublished content',
+    'view any unpublished content',
+    'upload editor images',
+    'access dashboard',
+    'view the administration theme',
+    'access administration bar',
+    'access content overview',
+    'access administration pages',
+    'access site in maintenance mode',
+    'flush caches',
+    'administer taxonomy',
+    'edit terms in categories',
+    'delete terms in categories',
+    'edit terms in tags',
+    'delete terms in tags',
+    'administer nodes',
+    'search content',
+    'use advanced search',
+    'access file overview',
+    'create files',
+    'view own files',
+    'view files',
+  );
+  user_role_grant_permissions('editor', $editor_permissions);
+
+  // إنشاء دور المسؤول
+  $admin_role = new stdClass();
+  $admin_role->name = 'administrator';
+  $admin_role->label = 'مسؤول';
+  $admin_role->description = 'له جميع الصلاحيات';
+  $admin_role->weight = 4;
+  $admin_role->permissions = array_keys(module_invoke_all('permission'));
+  user_role_save($admin_role);
+  config_set('system.core', 'user_admin_role', $admin_role->name);
+
+  // تعيين دور المسؤول للمستخدم الأول
+  $admin_user = user_load(1);
+  $admin_user->roles[] = 'administrator';
+  $admin_user->path['auto'] = TRUE;
+  user_save($admin_user);
+
+  // إعطاء صلاحيات للمستخدم العام
+  $anonymous_permissions = array(
+    'access content',
+    'access comments',
+  );
+  user_role_grant_permissions(BACKDROP_ANONYMOUS_ROLE, $anonymous_permissions);
+
+  $authenticated_permissions = array(
+    'access content',
+    'access comments',
+    'post comments',
+    'skip comment approval',
+    'view own unpublished content',
+    'search content',
+    'use advanced search',
+  );
+  user_role_grant_permissions(BACKDROP_AUTHENTICATED_ROLE, $authenticated_permissions);
+}
+
+/**
+ * Import default content for the news site.
+ */
+function _backdrop_news_import_default_content() {
+  // الصفحة الرئيسية
+  $home_page = entity_create('node', array(
+    'title' => st('مرحباً بك في موقع الأخبار'),
+    'type' => 'page',
+    'status' => NODE_PUBLISHED,
+    'promote' => 0,
+    'sticky' => 0,
+    'uid' => 1,
+    'body' => array(
+      LANGUAGE_NONE => array(
+        array(
+          'value' => '<p>' . st('أهلا وسهلا بك في موقع الأخبار الإخباري الشامل.') . '</p><p>' . st('نقدم لك أحدث الأخبار من حول العالم بشكل يومي ومستمر، مع تغطية شاملة للأحداث الهامة والمتطورات المستجدة.') . '</p><p>' . st('اختر التصنيف الذي يهمك من القائمة أعلاه وابقَ محدثاً مع آخر الأخبار والتطورات.') . '</p>',
+          'format' => 'basic_html',
+        ),
+      ),
+    ),
+  ));
+  $home_page->path = array('alias' => 'home', 'pathauto' => FALSE);
+  $home_page->save();
+
+  // صفحة من نحن
+  $about_page = entity_create('node', array(
+    'title' => st('من نحن'),
+    'type' => 'page',
+    'status' => NODE_PUBLISHED,
+    'promote' => 0,
+    'sticky' => 0,
+    'uid' => 1,
+    'body' => array(
+      LANGUAGE_NONE => array(
+        array(
+          'value' => '<p>' . st('موقع الأخبار هو منصة إعلامية متخصصة في نقل الأخبار بمصداقية وموثوقية عالية.') . '</p><p>' . st('فريقنا المتخصص والمحترف يعمل بجد وكفاءة لتقديم أفضل الخدمات الإخبارية والتحليلات المعمقة.') . '</p><p>' . st('نؤمن بأهمية نشر المعلومات الدقيقة والموثوقة لجمهورنا الكريم وقرائنا الأوفياء.') . '</p>',
+          'format' => 'basic_html',
+        ),
+      ),
+    ),
+  ));
+  $about_page->path = array('alias' => 'about', 'pathauto' => FALSE);
+  $about_page->save();
+
+  // صفحة تواصل معنا
+  $contact_page = entity_create('node', array(
+    'title' => st('تواصل معنا'),
+    'type' => 'page',
+    'status' => NODE_PUBLISHED,
+    'promote' => 0,
+    'sticky' => 0,
+    'uid' => 1,
+    'body' => array(
+      LANGUAGE_NONE => array(
+        array(
+          'value' => '<p>' . st('يمكنك التواصل معنا مباشرة من خلال البريد الإلكتروني أو نموذج الاتصال.') . '</p><p>' . st('كما يمكنك متابعتنا على جميع وسائل التواصل الاجتماعي للحصول على آخر الأخبار والتحديثات.') . '</p><p>' . st('نرحب بآرائك واقتراحاتك ونقدر تفاعلك ومساهمتك الغالية معنا.') . '</p>',
+          'format' => 'basic_html',
+        ),
+      ),
+    ),
+  ));
+  $contact_page->path = array('alias' => 'contact', 'pathauto' => FALSE);
+  $contact_page->save();
+
+  // مقالة عاجلة تجريبية
+  $breaking_article = entity_create('node', array(
+    'title' => st('خبر عاجل: تطورات جديدة في المجال التقني'),
+    'type' => 'article',
+    'status' => NODE_PUBLISHED,
+    'promote' => 1,
+    'sticky' => 1,
+    'uid' => 1,
+    'body' => array(
+      LANGUAGE_NONE => array(
+        array(
+          'value' => '<p>' . st('شهد المجال التقني تطورات مهمة جداً في الفترة الأخيرة، وتعتبر هذه التطورات نقطة تحول في صناعة التكنولوجيا.') . '</p><p>' . st('جاءت هذه التطورات لتغيير مسار العديد من الشركات العملاقة وتأثيرها يمتد إلى جميع القطاعات والمجالات.') . '</p><p>' . st('يتوقع الخبراء أن تستمر هذه الموجة من التطور والابتكار في السنوات القادمة.') . '</p>',
+          'format' => 'basic_html',
+        ),
+      ),
+    ),
+  ));
+  $breaking_article->path = array('pathauto' => TRUE);
+  $breaking_article->save();
+
+  // مقالة اقتصادية
+  $economy_article = entity_create('node', array(
+    'title' => st('تقرير خاص: الاقتصاد العالمي في 2024'),
+    'type' => 'article',
+    'status' => NODE_PUBLISHED,
+    'promote' => 1,
+    'sticky' => 0,
+    'uid' => 1,
+    'body' => array(
+      LANGUAGE_NONE => array(
+        array(
+          'value' => '<p>' . st('يتوقع الخبراء الاقتصاديون نمواً متوسطاً في الاقتصاد العالمي خلال هذا العام.') . '</p><p>' . st('هذا التقرير الشامل يشمل تحليلاً مفصلاً للأسواق الرئيسية والاتجاهات الاقتصادية العالمية.') . '</p><p>' . st('سيساعد هذا التقرير صناع القرار على فهم أفضل للمشهد الاقتصادي.') . '</p>',
+          'format' => 'basic_html',
+        ),
+      ),
+    ),
+  ));
+  $economy_article->path = array('pathauto' => TRUE);
+  $economy_article->save();
+
+  // مقالة رياضية
+  $sports_article = entity_create('node', array(
+    'title' => st('الرياضة: نتائج المباريات الأسبوعية'),
+    'type' => 'article',
+    'status' => NODE_PUBLISHED,
+    'promote' => 0,
+    'sticky' => 0,
+    'uid' => 1,
+    'body' => array(
+      LANGUAGE_NONE => array(
+        array(
+          'value' => '<p>' . st('شهد الأسبوع الماضي عدة مباريات مثيرة ومليئة بالمفاجآت.') . '</p><p>' . st('حقق الفريق المحلي فوزاً مهماً على الضيوف في مباراة درامية.') . '</p><p>' . st('كانت الأداء الفني لجميع الفرق على مستوى عالي من الاحترافية والمهارة.') . '</p>',
+          'format' => 'basic_html',
+        ),
+      ),
+    ),
+  ));
+  $sports_article->path = array('pathauto' => TRUE);
+  $sports_article->save();
+}
+
+/**
+ * Setup system settings.
+ */
+function _backdrop_news_setup_system_settings() {
+  // تعيين الصفحة الرئيسية
+  config_set('system.core', 'site_frontpage', 'home');
+
+  // تفعيل البحث
+  config_set('search.settings', 'default_module', 'node');
+
+  // إعدادات التعليقات
+  config_set('comment.settings', 'preview', COMMENT_PREVIEW_OPTIONAL);
+  config_set('comment.settings', 'form_location', COMMENT_FORM_BELOW);
+
+  // إعدادات الأداء
+  config_set('system.core', 'cache', 1);
+  config_set('system.core', 'preprocess_css', 1);
+  config_set('system.core', 'preprocess_js', 1);
+
+  // تفعيل Admin Bar
+  if (module_exists('admin_bar')) {
+    module_enable(array('admin_bar'));
+  }
+
+  // تفعيل CKEditor إذا كان متاحاً
+  if (module_exists('ckeditor')) {
+    module_enable(array('ckeditor'));
+  }
+
+  // إنشاء قائمة رئيسية
+  $main_menu_items = array(
+    array(
+      'link_title' => st('الرئيسية'),
+      'link_path' => '<front>',
+      'menu_name' => 'main-menu',
+      'weight' => 0,
+    ),
+    array(
+      'link_title' => st('من نحن'),
+      'link_path' => 'about',
+      'menu_name' => 'main-menu',
+      'weight' => 1,
+    ),
+    array(
+      'link_title' => st('تواصل معنا'),
+      'link_path' => 'contact',
+      'menu_name' => 'main-menu',
+      'weight' => 2,
+    ),
+  );
+
+  foreach ($main_menu_items as $item) {
+    menu_link_save($item);
+  }
+
+  menu_rebuild();
+}
