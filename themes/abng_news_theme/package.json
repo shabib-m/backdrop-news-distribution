@@ -1,0 +1,21 @@
+{
+  "name": "abng_news_theme",
+  "version": "1.0.0",
+  "description": "بيئة عمل تجميع وتطوير Tailwind CSS لقالب باك دروب الإخباري",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tailwindcss -i ./src/tailwind.css -o ./css/tailwind-built.css --watch",
+    "build": "tailwindcss -i ./src/tailwind.css -o ./css/tailwind-built.css --minify"
+  },
+  "keywords": [
+    "backdropcms",
+    "tailwind",
+    "theme"
+  ],
+  "author": "shabib-m",
+  "license": "GPL-2.0-or-later",
+  "devDependencies": {
+    "tailwindcss": "^3.4.0",
+    "daisyui": "^4.12.0"
+  }
+}

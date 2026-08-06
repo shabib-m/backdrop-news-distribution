@@ -1,0 +1,11 @@
+name = ABNG News Theme
+description = قالب إخباري عصري وسريع جداً يعتمد على إطار Tailwind CSS المخصص للتوزيعة.
+backdrop = 1.x
+type = theme
+
+; ربط ملفات الـ CSS والـ JS المجمعة والمحسنة للإنتاج
+stylesheets[all][] = css/style.css
+stylesheets[all][] = css/tailwind-built.css
+scripts[] = js/custom-news.js
+
+scripts[] = js/theme-toggle.js

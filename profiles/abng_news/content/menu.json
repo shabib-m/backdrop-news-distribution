@@ -1,0 +1,20 @@
+[
+    {
+    "link_path": "<front>",
+    "link_title": "Home",
+    "weight": 2,
+    "menu_name": "main-menu"
+  },
+  {
+    "link_path": "node/5",
+    "link_title": "About",
+    "weight": 1,
+    "menu_name": "main-menu"
+  },
+  {
+    "link_path": "node/4",
+    "link_title": "Contact",
+    "weight": 2,
+    "menu_name": "main-menu"
+  }
+]

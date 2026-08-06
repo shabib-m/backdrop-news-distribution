@@ -1,0 +1,14 @@
+name = Path
+description = Allows users to rename URLs.
+package = System
+tags[] = URL Handling
+version = BACKDROP_VERSION
+type = module
+backdrop = 1.x
+
+configure = admin/config/urls/path
+
+; Added by Backdrop CMS packaging script on 2026-07-22
+project = backdrop
+version = 1.34.3
+timestamp = 1784754661

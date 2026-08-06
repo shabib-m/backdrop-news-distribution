@@ -1,0 +1,38 @@
+[
+  {
+    "name": "تقنية",
+    "description": "كل ما يتعلق بالتقنية والابتكار",
+    "weight": 0,
+    "parent": ""
+  },
+  {
+    "name": "برمجة",
+    "description": "لغات وأدوات البرمجة",
+    "weight": 0,
+    "parent": "تقنية"
+  },
+  {
+    "name": "PHP",
+    "description": "مواضيع متعلقة بلغة PHP",
+    "weight": 0,
+    "parent": "برمجة"
+  },
+  {
+    "name": "JavaScript",
+    "description": "مواضيع متعلقة بجافا سكريبت",
+    "weight": 1,
+    "parent": "برمجة"
+  },
+  {
+    "name": "أخبار",
+    "description": "أخبار عامة ومستجدات",
+    "weight": 0,
+    "parent": ""
+  },
+  {
+    "name": "رياضة",
+    "description": "أخبار الرياضة",
+    "weight": 0,
+    "parent": "أخبار"
+  }
+]

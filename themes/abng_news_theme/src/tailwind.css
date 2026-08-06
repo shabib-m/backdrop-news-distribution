@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  @keyframes marquee {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  
+  .animate-marquee {
+    animation: marquee 25s linear infinite;
+  }
+  
+  .pause {
+    animation-play-state: paused;
+  }
+}
+
+/* تعريف الكلاس المخصص المضاف في لوحة تحكم الرابط */
+.btn-social-x {
+    @apply w-8 h-8 flex items-center justify-center rounded-full border-[2px] border-[#307c67] text-[#307c67] font-bold text-sm hover:bg-[#307c67] hover:text-white transition-all;
+}
+
+/* معالجة كلاس active الذي يفرضه باك دروب تلقائياً في الفوتر */
+footer .menu-item a.btn-social-x.active:not(:hover) {
+    @apply bg-transparent text-blue-600 border-blue-600;
+}

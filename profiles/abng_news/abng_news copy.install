@@ -1,0 +1,244 @@
+<?php
+/**
+ * @file
+ * Install/uninstall and update functions for the abng_news installation profile.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function abng_news_install() {
+  // Add text formats...
+  // (الكود السابق كما هو)
+
+  // Modify the default promoted view to exclude cards.
+  $promoted_view = views_get_view('promoted');
+  $promoted_view->display['default']->display_options['filters']['type'] = array(
+    'id' => 'type',
+    'table' => 'node',
+    'field' => 'type',
+    'operator' => 'not in',
+    'value' => array('card' => 'card'),
+  );
+  $promoted_view->save();
+
+  // Enable default permissions...
+  // (الكود السابق كما هو)
+
+  // تثبيت المحتوى من JSON
+  _abng_news_install_posts();
+}
+
+/**
+ * تثبيت المنشورات من JSON
+ */
+function _abng_news_install_posts() {
+  $profile_path = backdrop_get_path('profile', 'abng_news');
+  
+  // تحقق من المسار
+  if (!$profile_path) {
+    backdrop_set_message(t('❌ خطأ: لم يتم العثور على مسار التوزيعة!'), 'error');
+    watchdog('abng_news', 'Profile path not found', array(), WATCHDOG_ERROR);
+    return;
+  }
+  
+  // المسار الصحيح للملف
+  $posts_path = $profile_path . '/content/posts.json';
+  
+  // تحقق من وجود الملف
+  if (!file_exists($posts_path)) {
+    backdrop_set_message(t('⚠️ تحذير: ملف posts.json غير موجود على المسار: @path', 
+      ['@path' => $posts_path]), 'warning');
+    watchdog('abng_news', 'Posts file not found: @path', ['@path' => $posts_path], WATCHDOG_WARNING);
+    return;
+  }
+  
+  // قراءة الملف
+  $json_content = file_get_contents($posts_path);
+  
+  if ($json_content === FALSE) {
+    backdrop_set_message(t('❌ فشل في قراءة ملف posts.json'), 'error');
+    watchdog('abng_news', 'Failed to read posts file', array(), WATCHDOG_ERROR);
+    return;
+  }
+  
+  // فك ترميز JSON
+  $posts = json_decode($json_content, TRUE);
+  
+  // تحقق من أخطاء JSON
+  if (json_last_error() !== JSON_ERROR_NONE) {
+    $error_msg = json_last_error_msg();
+    backdrop_set_message(t('❌ خطأ في صيغة JSON: @error', ['@error' => $error_msg]), 'error');
+    watchdog('abng_news', 'JSON decode error: @error', ['@error' => $error_msg], WATCHDOG_ERROR);
+    return;
+  }
+  
+  // تحقق من أن البيانات مصفوفة
+  if (!is_array($posts) || empty($posts)) {
+    backdrop_set_message(t('⚠️ ملف posts.json فارغ أو صيغته خاطئة!'), 'warning');
+    watchdog('abng_news', 'Posts data is empty or not an array', array(), WATCHDOG_WARNING);
+    return;
+  }
+  
+  // إنشاء المنشورات
+  $count = 0;
+  foreach ($posts as $post_data) {
+    try {
+      // تحقق من البيانات المطلوبة
+      if (!isset($post_data['title']) || !isset($post_data['body'])) {
+        watchdog('abng_news', 'Post data missing required fields', array(), WATCHDOG_WARNING);
+        continue;
+      }
+      
+      $post = entity_create('node', array(
+        'title' => $post_data['title'],
+        'body' => array(
+          LANGUAGE_NONE => array(
+            array(
+              'value' => $post_data['body'],
+              'format' => isset($post_data['format']) ? $post_data['format'] : 'filtered_html',
+            ),
+          ),
+        ),
+        'uid' => isset($post_data['uid']) ? $post_data['uid'] : 1,
+        'status' => isset($post_data['status']) ? $post_data['status'] : 1,
+        'promote' => isset($post_data['promote']) ? $post_data['promote'] : 1,
+        'type' => isset($post_data['type']) ? $post_data['type'] : 'post',
+      ));
+      
+      // معالجة الحقول المختلفة
+      $fields_config = array(
+        'field_image' => array(
+          'single' => TRUE,
+          'alt_key' => 'image_alt',
+        ),
+        'field_news_images' => array(
+          'single' => FALSE,
+          'alt_key' => 'alt',
+        ),
+      );
+      
+      foreach ($fields_config as $field_name => $config) {
+        if (isset($post_data[$field_name])) {
+          _abng_news_attach_images($post, $profile_path, $post_data, $field_name, $config);
+        }
+      }
+      
+      $post->save();
+      $count++;
+      backdrop_set_message(t('✅ تم إنشاء المنشور: %title', ['%title' => $post_data['title']]), 'status');
+      watchdog('abng_news', 'Post created: @title', ['@title' => $post_data['title']], WATCHDOG_INFO);
+      
+    } catch (Exception $e) {
+      backdrop_set_message(t('❌ خطأ في إنشاء المنشور: @error', ['@error' => $e->getMessage()]), 'error');
+      watchdog('abng_news', 'Error creating post: @error', ['@error' => $e->getMessage()], WATCHDOG_ERROR);
+    }
+  }
+  
+  // رسالة نهائية
+  if ($count > 0) {
+    backdrop_set_message(t('✅ تم إنشاء %count منشور بنجاح', ['%count' => $count]), 'status');
+  }
+}
+
+/**
+ * دالة مساعدة موحدة لمعالجة الصور
+ */
+function _abng_news_attach_images(&$post, $profile_path, $post_data, $field_name, $config) {
+  if (!is_object($post)) {
+    watchdog('abng_news', 'Invalid post object', array(), WATCHDOG_ERROR);
+    return;
+  }
+  
+  $field_language = LANGUAGE_NONE;
+  $post->{$field_name}[$field_language] = array();
+  
+  // التحقق من وجود البيانات
+  if (!isset($post_data[$field_name])) {
+    return;
+  }
+  
+  $images = $config['single'] ? array($post_data[$field_name]) : $post_data[$field_name];
+  
+  if (!is_array($images)) {
+    $images = array($images);
+  }
+  
+  foreach ($images as $index => $image_data) {
+    if (!$image_data) {
+      continue;
+    }
+    
+    $filename = is_array($image_data) ? $image_data['filename'] : $image_data;
+    $alt = '';
+    
+    if (is_array($image_data) && isset($image_data[$config['alt_key']])) {
+      $alt = $image_data[$config['alt_key']];
+    } elseif ($config['single'] && isset($post_data[$config['alt_key']])) {
+      $alt = $post_data[$config['alt_key']];
+    }
+    
+    $file = _abng_news_save_file($profile_path, $filename, $field_name, $post_data['type']);
+    
+    if ($file) {
+      $post->{$field_name}[$field_language][$index] = array(
+        'fid' => $file->fid,
+        'display' => (is_array($image_data) && isset($image_data['display'])) ? $image_data['display'] : 1,
+        'description' => $alt,
+      );
+    }
+  }
+}
+
+/**
+ * حفظ الملف في المسار الصحيح
+ */
+function _abng_news_save_file($profile_path, $filename, $field_name, $node_type, $folder = 'images') {
+  // تحقق من الملفات الفارغة
+  if (!$filename) {
+    return FALSE;
+  }
+  
+  $file_path = $profile_path . '/' . $folder . '/' . $filename;
+  
+  // تحقق من وجود الملف
+  if (!file_exists($file_path)) {
+    watchdog('abng_news', 'File not found: @path', ['@path' => $file_path], WATCHDOG_WARNING);
+    return FALSE;
+  }
+  
+  try {
+    $field_instance = field_info_instance('node', $field_name, $node_type);
+    
+    if (!$field_instance) {
+      watchdog('abng_news', 'Field instance not found: @field on @type', 
+        ['@field' => $field_name, '@type' => $node_type], WATCHDOG_WARNING);
+      return FALSE;
+    }
+    
+    $file_directory = $field_instance['settings']['file_directory'];
+    $destination = 'public://' . $file_directory . '/' . basename($filename);
+    
+    // إنشاء المسار إذا لم يكن موجوداً
+    file_prepare_directory(dirname($destination), FILE_CREATE_DIRECTORY);
+    
+    // حفظ الملف
+    $file = file_save_data(
+      file_get_contents($file_path),
+      $destination,
+      FILE_EXISTS_REPLACE
+    );
+    
+    if (!$file) {
+      watchdog('abng_news', 'Failed to save file: @file', ['@file' => $filename], WATCHDOG_ERROR);
+      return FALSE;
+    }
+    
+    return $file;
+    
+  } catch (Exception $e) {
+    watchdog('abng_news', 'Error saving file: @error', ['@error' => $e->getMessage()], WATCHDOG_ERROR);
+    return FALSE;
+  }
+}
+?>

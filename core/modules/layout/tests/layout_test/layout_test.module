@@ -1,0 +1,294 @@
+<?php
+/**
+ * @file
+ * Layout test module.
+ */
+
+/**
+ * Implements hook_layout_template_info().
+ */
+function layout_test_layout_template_info() {
+  $layout_templates['layout_test_layout_template'] = array(
+    'title' => 'Layout test layout',
+    'regions' => array(
+      'header' => t('Header'),
+      'top' => t('Top'),
+      'content' => t('Content'),
+      'sidebar' => t('Sidebar'),
+      'footer' => t('Footer'),
+    ),
+    'default region' => 'content',
+    'path' => 'layout_test_layout_template',
+  );
+
+  return $layout_templates;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function layout_test_block_info() {
+  $blocks['foo'] = array(
+    'info' => t('Layout foo block'),
+    'description' => t('A testing block for layouts.'),
+  );
+  $blocks['bar'] = array(
+    'info' => t('Layout bar block'),
+    'description' => t('A testing block for layouts with contexts.'),
+    'required contexts' => array(
+      'my_node' => 'node',
+      'my_user' => 'user',
+    ),
+  );
+  $blocks['test_node_title'] = array(
+    'info' => t('Node title test'),
+    'description' => t('A testing block for layouts that shows the node title.'),
+    'required contexts' => array(
+      'node' => 'node',
+    ),
+  );
+  $blocks['test_passthrough'] = array(
+    'info' => t('String pass-through test'),
+    'description' => t('A testing block for layouts that shows string from the URL.'),
+    'required contexts' => array(
+      'string_value' => 'string',
+    ),
+  );
+  $blocks['simple_text'] = array(
+    'info' => t('A simple text block'),
+    'description' => t('A simple flat string for the most basic testing.'),
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function layout_test_menu() {
+  $items['layout-test-path'] = array(
+    'title' => 'Layout test title',
+    'page callback' => 'layout_test_path',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  $items['custom-layout-type-test-page'] = array(
+    'title' => 'Custom layout type test page',
+    'page callback' => 'layout_test_custom_layout_type_test_page',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function layout_test_block_view($delta = '', $settings = array(), $contexts = array()) {
+  $block = array();
+
+  switch ($delta) {
+    case 'foo':
+      $settings += array(
+        'count' => 0,
+      );
+      $block['subject'] = 'Foo subject';
+      $block['content'] = format_string('The setting of count is @setting.', array('@setting' => $settings['count']));
+      break;
+
+    case 'bar':
+      $block['subject'] = 'Bar subject';
+      $mail = !empty($contexts['my_user']->mail) ? $contexts['my_user']->mail : 'unavailable';
+      $block['content'] = format_string('The user email is @mail and the node title is @title', array('@mail' => $mail, '@title' => $contexts['my_node']->title));
+      break;
+
+    case 'test_node_title':
+      $block['subject'] = 'Node title';
+      $block['content'] = format_string('The node title is @title', array('@title' => $contexts['node']->title));
+      break;
+
+    case 'test_passthrough':
+      $block['subject'] = 'Passthrough title';
+      $block['content'] = format_string('The page argument is @string', array('@string' => $contexts['string_value']));
+      break;
+
+    case 'simple_text':
+      $block['subject'] = 'Simple text';
+      $block['content'] = t('This is a simple text block to test custom layout types.');
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function layout_test_block_configure($delta = '', $settings = array()) {
+  $form = array();
+  if ($delta == 'foo') {
+    $settings += array(
+      'count' => 10,
+    );
+    $form['count'] = array(
+      '#type' => 'select',
+      '#title' => 'Foo count to display',
+      '#default_value' => $settings['count'],
+      '#options' => backdrop_map_assoc(array(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 30)),
+    );
+  }
+  return $form;
+}
+
+/**
+ * Menu callback; Display a test page.
+ */
+function layout_test_path() {
+  return '<div id="layout-test-page-content">This is the layout test page.</div>';
+}
+
+/**
+ * Menu callback; Display a test page with a custom layout type.
+ */
+function layout_test_custom_layout_type_test_page() {
+  $custom_layout_template = layout_flexible_template_load('default', 'custom_test');
+  $config = array(
+    'name' => 'custom_layout_test',
+    'title' => 'Custom Layout Test',
+    'is_new' => TRUE,
+    'layout_template' => $custom_layout_template->name,
+    'layout_template_type' => 'custom_test',
+    'is_full_page' => FALSE,
+  );
+  $custom_layout = new Layout($config);
+  $custom_layout->addBlock('layout_test', 'simple_text', 'custom-layout-default-template--0');
+  $renderer = layout_create_renderer('standard', $custom_layout);
+  return $renderer->render();
+}
+
+/**
+ * Implements hook_config_info().
+ */
+function layout_test_config_info() {
+  $prefixes['layout.custom_test'] = array(
+    'name_key' => 'name',
+    'label_key' => 'title',
+    'group' => t('Custom Layout Type for Tests'),
+  );
+  return $prefixes;
+}
+
+/**
+ * Implements hook_theme_registry_alter().
+ *
+ * Ensure the flexible layout template is registered, whether or not it is
+ * being used in core layouts.
+ */
+function layout_test_theme_registry_alter(&$theme_registry) {
+  if (!isset($theme_registry['layout__flexible'])) {
+    $theme_registry['layout__flexible'] = array(
+      'variables' => array(
+        'content' => NULL,
+        'settings' => NULL,
+        'layout' => NULL,
+        'layout_template_info' => NULL,
+        'renderer' => NULL,
+        'attributes' => array(),
+        'admin' => FALSE,
+      ),
+      'template' => 'layout--flexible',
+      'path' => backdrop_get_path('module', 'layout') . '/templates',
+      'theme path' => backdrop_get_path('module', 'layout') . '/templates',
+      'type' => 'module',
+      'base hook' => 'layout',
+    );
+  }
+}
+
+/**
+ * Implements hook_layout_presave().
+ */
+function layout_test_layout_presave($layout) {
+  $return = state_get('layout_test');
+  $return[] = (__FUNCTION__ . ' called');
+  state_set('layout_test', $return);
+}
+
+/**
+ * Implements hook_layout_insert().
+ */
+function layout_test_layout_insert($layout) {
+  $return = state_get('layout_test');
+  $return[] = (__FUNCTION__ . ' called');
+  state_set('layout_test', $return);
+}
+
+/**
+ * Implements hook_layout_update().
+ */
+function layout_test_layout_update($layout) {
+  $return = state_get('layout_test');
+  $return[] = (__FUNCTION__ . ' called');
+  state_set('layout_test', $return);
+}
+
+/**
+ * Implements hook_layout_disable().
+ */
+function layout_test_layout_disable($layout) {
+  $return = state_get('layout_test');
+  $return[] = (__FUNCTION__ . ' called');
+  state_set('layout_test', $return);
+}
+
+/**
+ * Implements hook_layout_enable().
+ */
+function layout_test_layout_enable($layout) {
+  $return = state_get('layout_test');
+  $return[] = (__FUNCTION__ . ' called');
+  state_set('layout_test', $return);
+}
+
+/**
+ * Implements hook_layout_delete().
+ */
+function layout_test_layout_delete($layout) {
+  $return = state_get('layout_test');
+  $return[] = (__FUNCTION__ . ' called');
+  state_set('layout_test', $return);
+}
+
+/**
+ * Implements hook_layout_template_change().
+ */
+function layout_test_layout_template_change($layout, $old_template) {
+  $return = state_get('layout_test');
+  $return[] = (__FUNCTION__ . ' called');
+  state_set('layout_test', $return);
+}
+
+/**
+ * Implements hook_layout_revert().
+ */
+function layout_test_layout_revert($layout) {
+  $return = state_get('layout_test');
+  $return[] = (__FUNCTION__ . ' called');
+  state_set('layout_test', $return);
+}
+/**
+ * Implements hook_autoload_info().
+ */
+function layout_test_autoload_info() {
+  return array(
+    'LayoutTestRenderer' => 'layout_test_renderer.inc',
+  );
+}
+
+/**
+ * Implements hook_layout_renderer_info().
+ */
+function layout_test_layout_renderer_info() {
+  $info['test_renderer'] = array(
+    'class' => 'LayoutTestRenderer',
+  );
+  return $info;
+}

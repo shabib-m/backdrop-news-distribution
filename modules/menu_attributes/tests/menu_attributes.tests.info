@@ -1,0 +1,16 @@
+[MenuAttributesTestCase]
+name = Menu attributes main tests
+description = Tests menu attributes functionality.
+group = Menu attributes
+file = menu_attributes.test
+
+[MenuAttributesNodeTestCase]
+name = Menu attributes settings for nodes
+description = Add, edit, and delete a node with menu link.
+group = Menu attributes
+file = menu_attributes.test
+
+; Added by Backdrop CMS packaging script on 2022-08-23
+project = menu_attributes
+version = 1.x-1.0.2
+timestamp = 1661308450

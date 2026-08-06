@@ -1,0 +1,108 @@
+<?php
+
+/**
+ * @file
+ * Install file for the custom_breadcrumbs_panels module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function custom_breadcrumbs_panels_schema() {
+  $schema['custom_breadcrumbs_panels'] = array(
+    'description' => 'Stores custom breadcrumb trail overrides for panels pages.',
+    'fields' => array(
+      'bid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Unique identifier for the {custom_breadcrumbs_panels}.',
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => FALSE,
+        'description' => 'An optional name for the custom breadcrumb.',
+      ),
+      'titles' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'A return-delimited list of titles for the breadcrumb links.',
+      ),
+      'paths' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'description' => 'A return-delimited list of url paths for the breadcrumb links.',
+      ),
+      'panel_id' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'description' => 'The Id of the panel for this custom breadcrumb.',
+      ),
+      'langcode' => array(
+        'type' => 'varchar',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The language this breadcrumb is for; if blank, the breadcrumb will be used for unknown languages.',
+      ),
+    ),
+    'indexes' => array(
+      'langcode' => array('langcode'),
+      'panelid_langcode' => array('panel_id', 'langcode'),
+    ),
+    'primary key' => array('bid'),
+  );
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function custom_breadcrumbs_panels_uninstall() {
+  // Reset config to defaults.
+  config_set('custom_breadcrumbs.settings', 'custom_breadcrumbs_taxonomy_panels', FALSE);
+}
+
+/**
+ * Move custom breadcrumbs panels settings from variables to config. Rename
+ * language column to langcode.
+ */
+function custom_breadcrumbs_panels_update_1000() {
+  $config = config('custom_breadcrumbs.settings');
+  $config->set('custom_breadcrumbs_taxonomy_panels', update_variable_get('custom_breadcrumbs_taxonomy_panels', FALSE);
+  $config->save();
+
+  // Delete variables.
+  update_variable_del('custom_breadcrumbs_taxonomy_panels');
+
+  // Rename language column to langcode.
+  db_drop_index('custom_breadcrumbs_panels', 'language');
+  db_drop_index('custom_breadcrumbs_panels', 'panelid_language');
+  $langcode_spec = array(
+    'type' => 'varchar',
+    'length' => 12,
+    'not null' => TRUE,
+    'default' => '',
+    'description' => 'The language this breadcrumb is for; if blank, the breadcrumb will be used for unknown languages.',
+  );
+  $indexes_spec = array(
+    'langcode' => array('langcode'),
+    'panelid_langcode' => array('panel_id', 'langcode'),
+  );
+  db_change_field('custom_breadcrumbs_panels', 'language', 'langcode', $langcode_spec, $indexes_spec);
+}
+
+
+ /**
+  * Remove unneeded PHP visibility field.
+  */
+  function custom_breadcrumbs_panels_update_2000 () {
+    if (db_field_exists('custom_breadcrumbs_panels', 'visibility_php')) {
+      db_drop_field('custom_breadcrumbs_panels', 'visibility_php');
+    }
+  }

@@ -1,0 +1,69 @@
+<?php
+
+/**
+ * Implements hook_init
+ */
+function ckeditor5_font_plugin_init() {
+  // Add in our custom CSS.
+  backdrop_add_css(backdrop_get_path('module', 'ckeditor5_font_plugin') . '/css/ckeditor5_font_plugin.css');
+}
+
+
+/**
+ * Implements hook_ckeditor5_plugins().
+ *
+ * Return a list of all plugins provided by this module.
+ *
+ * https://ckeditor.com/docs/ckeditor5/latest/features/font.html
+ *
+ */
+function ckeditor5_font_plugin_ckeditor5_plugins() {
+
+  $plugins['fontFamily.FontFamily'] = array(
+    'buttons' => array(
+      'fontFamily' => array(
+        'label' => t('Font'),
+        'image_alternative' => '<span class="ckeditor5-button-dropdown">' . t('Font') . '<span class="ckeditor5-button-arrow"></span></span>',
+        'required_html' => array('<span>'),
+      ),
+    ),
+  );
+
+  $plugins['fontSize.FontSize'] = array(
+    'buttons' => array(
+      'fontSize' => array(
+        'label' => t('Font Size'),
+        'image_alternative' => '<span class="ckeditor5-button-dropdown">' . t('Font Size') . '<span class="ckeditor5-button-arrow"></span></span>',
+        'required_html' => array('<span>'),
+      ),
+    ),
+  );
+
+  $plugins['fontColor.FontColor'] = array(
+    'buttons' => array(
+      'fontColor' => array(
+        'label' => t('Font Color'),
+        'image_alternative' => '<span class="ckeditor5-button-dropdown">' . t('Font Color') . '<span class="ckeditor5-button-arrow"></span></span>',
+        'required_html' => array('<span>'),
+      ),
+    ),
+  );
+
+  $plugins['fontBackgroundColor.FontBackgroundColor'] = array(
+    'buttons' => array(
+      'fontBackgroundColor' => array(
+        'label' => t('Font Background'),
+        'image_alternative' => '<span class="ckeditor5-button-dropdown">' . t('Font Background') . '<span class="ckeditor5-button-arrow"></span></span>',
+        'required_html' => array('<span>'),
+      ),
+    ),
+  );
+
+
+
+
+  return $plugins;
+
+}
+
+

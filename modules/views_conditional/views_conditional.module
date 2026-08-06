@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * @file
+ * Views condition is a simple module that allows
+ * you to define conditionals (if xxx then yyy) with
+ * fields in views.  Conditions include:
+ *   - Equal to
+ *   - NOT equal to
+ *   - Greater than
+ *   - Less than
+ *   - Empty
+ *   - NOT empty
+ *   - Contains
+ *   - Does NOT Contain
+ *   - Length Equal to
+ *   - Length Not Equal to
+ *   - Length Greater than
+ *   - Length Less than
+ *
+ * Views conditionals allows you to output text
+ * based on the result of the condition.
+ *
+ * @author MChittenden
+ */
+
+/**
+ * Implements hook_views_api().
+ */
+function views_conditional_views_api() {
+  return array(
+    'api' => '3',
+    'path' => backdrop_get_path('module', 'views_conditional') . '/views',
+  );
+}
+
+/**
+ * Implements hook_autoload_info().
+ */
+function views_conditional_autoload_info() {
+  return array(
+    // Views handlers.
+    'ViewsConditionalHandler' => 'views/views_conditional_handler.inc',
+  );
+}

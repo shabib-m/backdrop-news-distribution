@@ -1,0 +1,5 @@
+<?php
+
+function ckeditor5_font_plugin_enable() {
+  backdrop_set_message(t("You have enabled the CKEditor 5 Font Plugin module. <strong>At this time, this module will only work if your text format has 'Limit allowed HTML tags' turned OFF.</strong>"));
+}

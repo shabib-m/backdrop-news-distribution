@@ -1,0 +1,45 @@
+[
+    {
+      "name" : "اخبار محلية",
+      "description" : "",
+      "vocabulary" : "alaqsam_alakhbaryt",
+      "weight" : "0"
+    },
+    {
+      "name" : "اخبار الشرق الاوسط",
+      "description" : "",
+      "vocabulary" : "alaqsam_alakhbaryt",
+      "weight" : "0"
+
+    },
+    {
+      "name" : "اخبار عالمية",
+      "description" : "",
+      "vocabulary" : "alaqsam_alakhbaryt",
+      "weight" : "0"
+    },
+    {
+      "name" : "اخبار رياضية",
+      "description" : "",
+      "vocabulary" : "alaqsam_alakhbaryt",
+      "weight" : "0"
+    },
+    {
+      "name" : "اخبار تقنية",
+      "description" : "",
+      "vocabulary" : "alaqsam_alakhbaryt",
+      "weight" : "0"
+    },
+    {
+      "name" : "اخبار سياسية",
+      "description" : "",
+      "vocabulary" : "alaqsam_alakhbaryt",
+      "weight" : "0"
+    },
+    {
+      "name" : "اخبار اقتصادية",
+      "description" : "",
+      "vocabulary" : "alaqsam_alakhbaryt",
+      "weight" : "0"
+    }
+]

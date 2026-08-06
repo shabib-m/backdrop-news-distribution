@@ -1,0 +1,168 @@
+.views-exposed-form .views-exposed-widget,
+.views-bulk-form .form-item,
+.views-bulk-form .form-actions {
+  display: inline-block;
+  padding: .5em 1em 0 0; /* LTR */
+}
+[dir="rtl"] .views-exposed-form .views-exposed-widget,
+[dir="rtl"] .views-bulk-form .form-item,
+[dir="rtl"] .views-bulk-form .form-actions {
+  padding: .5em 0 0 1em;
+}
+
+.views-exposed-form .form-item,
+.views-exposed-form .form-submit {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.views-exposed-form label {
+  font-weight: bold;
+}
+
+.views-exposed-widgets {
+  margin-bottom: .5em;
+}
+
+.views-bulk-form .form-item,
+.views-bulk-form .form-actions,
+.views-bulk-form .form-submit {
+  display: inline-block;
+  vertical-align: bottom;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.views-bulk-form {
+  margin-bottom: 1em;
+}
+
+/* table style column align */
+.views-align-left {
+  text-align: left;
+}
+.views-align-right {
+  text-align: right;
+}
+.views-align-center {
+  text-align: center;
+}
+
+/* Views grid styles */
+
+.views-view-grid {
+  display: grid;
+}
+.views-view-grid-cols-1 {
+  grid-template-columns: repeat(1, 1fr);
+}
+.views-view-grid-cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.views-view-grid-cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.views-view-grid-cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+.views-view-grid-cols-5 {
+  grid-template-columns: repeat(5, 1fr);
+}
+.views-view-grid-cols-6 {
+  grid-template-columns: repeat(6, 1fr);
+}
+.views-view-grid-cols-7 {
+  grid-template-columns: repeat(7, 1fr);
+}
+.views-view-grid-cols-8 {
+  grid-template-columns: repeat(8, 1fr);
+}
+.views-view-grid-cols-9 {
+  grid-template-columns: repeat(9, 1fr);
+}
+.views-view-grid-cols-10 {
+  grid-template-columns: repeat(10, 1fr);
+}
+.views-view-grid-cols-11 {
+  grid-template-columns: repeat(11, 1fr);
+}
+.views-view-grid-cols-12 {
+  grid-template-columns: repeat(12, 1fr);
+}
+.views-view-grid .views-row, .views-view-grid .views-grid-box {
+  padding: 1rem;
+  border: 1px solid #cccccc;
+}
+
+/* Remove the border on tbody that system puts in */
+/* Deprecated */
+.views-view-grid tbody {
+  border-top: none;
+}
+
+/* Views responsive grid styles */
+
+.views-view-responsive-grid {
+  --views-responsive-grid--layout-gap: 2rem;
+  /* Will be overridden by an inline style. */
+  --views-responsive-grid--column-count: 4;
+  /* Will be overridden by an inline style. */
+  --views-responsive-grid--cell-min-width: 16rem;
+  /* Will be overridden by an inline style. */
+
+  display: inherit;
+}
+
+.views-view-responsive-grid--horizontal {
+  /* Calculated values. */
+  --views-responsive-grid--gap-count: calc(var(--views-responsive-grid--column-count) - 1);
+  --views-responsive-grid--total-gap-width: calc(var(--views-responsive-grid--gap-count) * var(--views-responsive-grid--layout-gap));
+  --views-responsive-grid-item--max-width: calc((100% - var(--views-responsive-grid--total-gap-width)) / var(--views-responsive-grid--column-count));
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(max(var(--views-responsive-grid--cell-min-width), var(--views-responsive-grid-item--max-width)), 1fr));
+  gap: var(--views-responsive-grid--layout-gap);
+}
+
+.views-view-responsive-grid--vertical {
+  margin-bottom: calc(var(--views-responsive-grid--layout-gap) * -1); /* Offset the bottom row's padding. */
+  column-width: var(--views-responsive-grid--cell-min-width);
+  column-count: var(--views-responsive-grid--column-count);
+  column-gap: var(--views-responsive-grid--layout-gap);
+}
+
+.views-view-responsive-grid--vertical .views-grid-box>* {
+  padding-bottom: var(--views-responsive-grid--layout-gap);
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* Fix pager links bouncing around with ajax */
+.view .progress-disabled {
+  float: none;
+}
+
+/* Bulk form select all pages */
+.views-select-all-pages--wrapper {
+  display: none;
+}
+
+.views-select-all-pages--row {
+  display: none;
+}
+.views-select-all-pages--row td {
+  text-align: center;
+}
+
+/* Generic bulk form "select all" for non-tables */
+.views-select-all-pages--fieldset {
+  text-align: left;
+  padding: 0.6em 0;
+}
+.views-select-all-pages--fieldset .form-item {
+  margin-bottom: 0;
+}
+.views-select-all-pages--fieldset div {
+  padding: 0;
+  margin: 0;
+}

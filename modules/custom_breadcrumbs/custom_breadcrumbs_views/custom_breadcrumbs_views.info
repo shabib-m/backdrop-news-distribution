@@ -1,0 +1,14 @@
+name = Custom breadcrumbs for views
+description = Provides custom breadcrumbs for views pages.
+package = Custom breadcrumbs
+dependencies[] = custom_breadcrumbs
+dependencies[] = views
+backdrop = 1.x
+type = module
+
+configure = admin/config/user-interface/custom-breadcrumbs
+
+; Added by Backdrop CMS packaging script on 2025-11-25
+project = custom_breadcrumbs
+version = 1.x-2.0.0
+timestamp = 1764082900

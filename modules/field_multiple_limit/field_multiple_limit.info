@@ -1,0 +1,12 @@
+name = Field Multiple Limit
+description = Provides extra field formatter settings to specify the number of values to display on multi-value fields.
+backdrop = 1.x
+type = module
+package = Fields
+
+dependencies[] = system (>=1.13.0)
+
+; Added by Backdrop CMS packaging script on 2019-08-22
+project = field_multiple_limit
+version = 1.x-1.0.4
+timestamp = 1566492894

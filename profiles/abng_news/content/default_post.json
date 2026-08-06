@@ -1,0 +1,56 @@
+[
+  {
+    "title": "The Home page layout",
+    "body": "<p>Use the home page layout to specifically customize this page. These Cards only appear on this layout.</p><p><a href=\"https://docs.backdropcms.org/documentation/the-home-page\">Learn more about the Home page</a></p>",
+    "type": "card",
+    "status": 1,
+    "promote": 1,
+    "uid": 1,
+    "image_filename": "card1-layout.png",
+    "category_tid": 1
+  },
+  {
+    "title": "What is a Card?",
+    "body": "<p>A Card can only be seen as part of another page. Place them individually as \"Existing content\" Blocks, or grouped as in a View.</p><p><a href=\"https://docs.backdropcms.org/documentation/creating-and-editing-content\">Learn more about Cards</a></p>",
+    "type": "card",
+    "status": 1,
+    "promote": 1,
+    "uid": 1,
+    "image_filename": "card2-card.png",
+    "category_tid": 2
+  },
+  {
+    "title": "Organize your content",
+    "body": "<p>Backdrop CMS includes three pre-defined types of content: Pages, Posts, and Cards. Custom content types can also be added.</p><p><a href=\"https://docs.backdropcms.org/documentation/content-types\">Learn more about content types</a></p>",
+    "type": "card",
+    "status": 1,
+    "promote": 1,
+    "uid": 1,
+    "image_filename": "card3-organize.png"
+  },
+  {
+    "title": "Your first post!",
+    "body": "<p>This is your first post! You can edit or delete it at any time.</p>",
+    "type": "post",
+    "status": 1,
+    "promote": 1,
+    "uid": 1
+  },
+  {
+    "title": "About",
+    "body": "<p>This is a page with static content. You may edit or delete it.</p>",
+    "type": "page",
+    "status": 1,
+    "promote": 0,
+    "uid": 1
+  },
+  {
+    "title": "مرحباً بك في الموقع",
+    "body": "<p>هذا هو أول منشور لك، يمكنك تعديله أو حذفه.</p>",
+    "format": "filtered_html",
+    "uid": 1,
+    "status": 1,
+    "promote": 1,
+    "type": "post"
+  }
+]

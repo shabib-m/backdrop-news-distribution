@@ -1,0 +1,26 @@
+<?php
+/**
+ * @file
+ * Metatag: Search API test helper module.
+ */
+
+/**
+ * Implements hook_search_api_service_info().
+ */
+function metatag_search_test_search_api_service_info() {
+  $services['metatag_search_test_service'] = array(
+    'name' => 'metatag_search_test_service',
+    'description' => 'metatag_search_test_service description',
+    'class' => 'MetatagSearchTestSearchApiService',
+  );
+  return $services;
+}
+
+/**
+ * Implements hook_autoload_info().
+ */
+function metatag_search_test_autoload_info() {
+  return array(
+    'MetatagSearchTestSearchApiService' => 'metatag_search_test.class.inc',
+  );
+}

@@ -1,0 +1,113 @@
+<?php
+/**
+ * @file
+ * Install/uninstall and update functions for the abng_news installation profile.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * Perform actions to set up the site for this profile.
+ *
+ * @see system_install()
+ */
+function abng_news_install() {
+ 
+  // Enable abng_news_theme theme and set it as default theme instead of Stark.
+  // @see system_install()
+  $default_theme = 'abng_news_theme'; 
+  // 1. تفعيل القالب الجديد أولاً ليصبح متاحاً للنظام
+  theme_enable(array($default_theme));
+  // 2. تعيين القالب كقالب افتراضي للواجهة
+  config_set('system.core', 'theme_default', $default_theme);
+  // 3. تعطيل القالب القديم (اختياري وآمن)
+  theme_disable(array('stark'));
+
+  // Set home page to "home".
+  config_set('system.core', 'site_frontpage', 'home');
+  backdrop_flush_all_caches();
+
+
+  // Add default alias for page content types.
+  config('path.settings')
+    ->set('node_page_pattern', '[node:title]')
+    ->set('node_post_pattern', 'posts/[node:title]')
+    ->set('node_card_pattern', 'node/[node:nid]')
+    ->save();
+
+  cache_clear_all();
+
+  // Modify the default promoted view to exclude cards.
+  $promoted_view = views_get_view('promoted');
+  $promoted_view->display['default']->display_options['filters']['type'] = array(
+    'id' => 'type',
+    'table' => 'node',
+    'field' => 'type',
+    'operator' => 'not in',
+    'value' => array('card' => 'card'),
+  );
+  $promoted_view->save();
+
+  // Enable default permissions for system roles.
+  $filtered_html_permission = filter_permission_name($filtered_html_format);
+  $anonymous_permissions = array(
+    'access content',
+    'access comments',
+    $filtered_html_permission,
+  );
+  $authenticated_permissions = array(
+    'access content',
+    'access comments',
+    'post comments',
+    'skip comment approval',
+    'upload editor images',
+    $filtered_html_permission,
+  );
+  user_role_grant_permissions(BACKDROP_ANONYMOUS_ROLE, $anonymous_permissions);
+  user_role_grant_permissions(BACKDROP_AUTHENTICATED_ROLE, $authenticated_permissions);
+
+  // Create a default role for site administrators, with all available
+  // permissions assigned.
+  $admin_role = new stdClass();
+  $admin_role->name = 'administrator';
+  $admin_role->label = 'Administrator';
+  $admin_role->description = 'Can manage content and configuration, including the ability to assign roles.';
+  $admin_role->weight = 3;
+  $admin_role->permissions = array_keys(module_invoke_all('permission'));
+  user_role_save($admin_role);
+  // Set this as the administrator role.
+  config_set('system.core', 'user_admin_role', $admin_role->name);
+
+  // Assign the "Administrator" role to user 1, and make sure that generation of
+  // automatic path alias is enabled.
+  $admin_user = user_load(1);
+  $admin_user->roles[] = $admin_role->name;
+  $admin_user->path['auto'] = TRUE;
+  user_save($admin_user);
+
+  // Create a login link in the account menu.
+  $item = array(
+    'link_title' => st('Login'),
+    'link_path' => 'user/login',
+    'menu_name' => 'user-menu',
+    'weight' => -1,
+  );
+  menu_link_save($item);
+
+  // Update the menu router information.
+  menu_rebuild();
+
+  // Enable the admin theme.
+  db_update('system')
+    ->fields(array('status' => 1))
+    ->condition('type', 'theme')
+    ->condition('name', 'seven')
+    ->execute();
+  config_set('system.core', 'admin_theme', 'seven');
+  config_set('system.core', 'node_admin_theme', '1');
+
+  // Enable the page cache and aggregation.
+  config_set('system.core', 'preprocess_css', '1');
+  config_set('system.core', 'preprocess_js', '1');
+  config_set('system.core', 'cache', '1');
+}

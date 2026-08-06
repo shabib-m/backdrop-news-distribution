@@ -1,0 +1,135 @@
+<?php
+/**
+ * @file
+ * Provides native meta tag integration with Views.
+ */
+
+function metatag_views_autoload_info() {
+  return array(
+    'metatag_views_plugin_display_extender_metatags' => 'metatag_views_plugin_display_extender_metatags.inc',
+  );
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function metatag_views_views_api() {
+  return array(
+    'api' => 3,
+    'path' => backdrop_get_path('module', 'metatag_views'),
+  );
+}
+
+/**
+ * Implements hook_metatag_token_types_alter().
+ */
+function metatag_views_metatag_token_types_alter(&$options) {
+  if ($options['context'] == 'view') {
+    $options['token types'][] = 'view';
+  }
+}
+
+/**
+ * Implements hook_view_preview_info_alter().
+ */
+function metatag_views_views_preview_info_alter(&$rows, $view) {
+  $metatags = $view->display_handler->get_option('metatags');
+  if (!is_array($metatags) || empty($metatags)) {
+    return;
+  }
+
+  // If meta tags were found but they're not nested for the language, fix it.
+  // This leaves some possibility for future versions to support translation.
+  if (!empty($metatags) && !isset($metatags[LANGUAGE_NONE])) {
+    $metatags = array(LANGUAGE_NONE => $metatags);
+  }
+
+  // Set the page title to be the previewed views title before fetching meta
+  // tag values.
+  $title = backdrop_set_title();
+  if ($view_title = $view->get_title()) {
+    backdrop_set_title($view_title);
+  }
+
+  $instance = 'view:' . $view->name;
+  $options['token data']['view'] = $view;
+  $values = metatag_metatags_values($instance, $metatags, $options);
+  foreach ($values as $metatag => $value) {
+    $metatag_info = metatag_get_info('tags', $metatag);
+    $values[$metatag] = $metatag_info['label'] . ': ' . check_plain($value);
+  }
+  if (!empty($values)) {
+    $rows['query'][] = array(
+      '<strong>' . t('Meta tags') . '</strong>',
+      implode('<br />', $values),
+    );
+  }
+
+  // Restore the page title.
+  backdrop_set_title($title);
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function metatag_views_preprocess_page(&$variables) {
+  // By default, do not add meta tags to admin pages. To enable meta tags on
+  // admin pages set the 'tag_admin_pages' config value to TRUE.
+  if (path_is_admin(current_path()) && config('metatag.settings')->get('tag_admin_pages') == FALSE) {
+    return;
+  }
+
+  $view = views_get_page_view();
+
+  // Check if Views metatags are enabled.
+  if (!empty($view) && metatag_config_is_enabled('view')) {
+    global $language;
+
+    // The following is taken from views_get_page_view().
+    // If a module is still putting in the display like we used to, catch that.
+    if (is_subclass_of($view, 'views_plugin_display')) {
+      $view = $view->view;
+    }
+
+    // Prevent Views settings from overwriting global:frontpage.
+    if (backdrop_is_front_page() && metatag_config_is_enabled('global:frontpage')) {
+      return;
+    }
+
+    // Include only view name by default.
+    $instance = 'view:' . $view->name;
+
+    // Include display name if option is overridden.
+    if (!$view->display_handler->is_defaulted('metatags')) {
+      $instance = 'view:' . $view->name . ':' . $view->current_display;
+    }
+
+    // Load the meta tags for this view.
+    $metatags = $view->display_handler->get_option('metatags');
+
+    // Only proceed if there's something to work with.
+    if (!empty($metatags) && is_array($metatags)) {
+      // If meta tags were found but they're not nested for the language, fix
+      // it. This leaves some possibility for future versions to support
+      // translation.
+      if (!isset($metatags[LANGUAGE_NONE])) {
+        $metatags = array(LANGUAGE_NONE => $metatags);
+      }
+
+      // Translate all of the meta tags using i18n, but don't update the
+      // strings.
+      metatag_translate_metatags($metatags[LANGUAGE_NONE], 'metatag_views:' . $view->name . '__' . $view->current_display, NULL, FALSE);
+
+      // Build options for meta tag rendering.
+      $options = array();
+      $options['token data']['view'] = $view;
+      $options['language'] = $language->langcode;
+
+      // Add the metatags.
+      $processed_metatags = metatag_metatags_view($instance, $metatags, $options);
+      foreach ($processed_metatags as $name => $data) {
+        backdrop_add_html_head($data, $name);
+      }
+    }
+  }
+}

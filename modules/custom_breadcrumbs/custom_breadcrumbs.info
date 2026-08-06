@@ -1,0 +1,17 @@
+name = Custom breadcrumbs
+package = Custom breadcrumbs
+description = Allows administrators to define custom breadcrumb trails for node types.
+backdrop = 1.x
+type = module
+
+configure = admin/config/user-interface/custom-breadcrumbs
+
+# @codingStandardsIgnoreLine
+files[] = custom_breadcrumbs.admin.inc
+# @codingStandardsIgnoreLine
+files[] = custom_breadcrumbs_common.inc
+
+; Added by Backdrop CMS packaging script on 2025-11-25
+project = custom_breadcrumbs
+version = 1.x-2.0.0
+timestamp = 1764082900

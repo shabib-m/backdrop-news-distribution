@@ -1,0 +1,16 @@
+[MetatagFaviconsTest]
+name = Metatag Favicons tests
+description = Test the Metatag:Favicons module.
+group = Metatag
+file = metatag_favicons.test
+
+[MetatagFaviconsTagsTest]
+name = Metatag tags: Favicons
+description = Test the Favicons meta tags.
+group = Metatag
+file = metatag_favicons.tags.test
+
+; Added by Backdrop CMS packaging script on 2025-05-08
+project = metatag
+version = 1.x-1.22.7
+timestamp = 1746755296

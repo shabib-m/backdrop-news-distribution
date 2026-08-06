@@ -1,0 +1,12 @@
+name = Metatag: Devel
+description = Provides development / debugging functionality for the Metatag module. Integrates with Devel Generate.
+package = Development
+backdrop = 1.x
+type = module
+
+dependencies[] = metatag
+
+; Added by Backdrop CMS packaging script on 2025-05-08
+project = metatag
+version = 1.x-1.22.7
+timestamp = 1746755296

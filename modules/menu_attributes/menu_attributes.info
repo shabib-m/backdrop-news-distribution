@@ -1,0 +1,12 @@
+name = Menu attributes
+description = "Allows administrators to specify custom attributes for menu items."
+package = Menu
+type = module
+dependencies[] = menu
+backdrop = 1.x
+configure = admin/structure/menu/settings
+
+; Added by Backdrop CMS packaging script on 2022-08-23
+project = menu_attributes
+version = 1.x-1.0.2
+timestamp = 1661308450

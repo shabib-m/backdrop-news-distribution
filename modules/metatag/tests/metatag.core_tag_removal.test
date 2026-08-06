@@ -1,0 +1,78 @@
+<?php
+/**
+ * @file
+ * Tests for the Metatag module to ensure removal of core tags works correctly.
+ */
+
+include_once __DIR__ . '/metatag.helper.test';
+
+class MetatagCoreTagRemovalTest extends MetatagTestHelper {
+
+  /**
+   * Test that the core meta tags work correctly.
+   */
+  function testCoreTagRemoval() {
+    // Enable core tags and the generator override.
+    config_set('metatag.settings', 'enabled_tags.generator', 'generator');
+    config_set('metatag.settings', 'leave_core_tags', TRUE);
+
+    // The default generator string that both Metatag and backdrop core use.
+    $generator_global = 'Backdrop CMS (http://backdropcms.org)';
+    $generator_core = 'Backdrop CMS 1 (https://backdropcms.org)';
+
+    // Load the front page.
+    $this->backdropGet('<front>');
+    $this->assertResponse(200);
+
+    // Confirm that the Generator tag is the global default.
+    $xpath = $this->xpath("//meta[@name='generator']");
+    $this->assertEqual(count($xpath), 1, 'Exactly one generator meta tag found.');
+    $this->assertEqual($xpath[0]['content'], $generator_global);
+
+    // Confirm the Generator tag is also added as an HTTP header.
+    $this->assertEqual($this->backdropGetHeader('X-Generator'), $generator_global, 'X-Generator HTTP header added.');
+
+    // Update the global config to remove the 'generator' value.
+    $config = metatag_config_load('global');
+    unset($config['config']['generator']);
+    metatag_config_save($config);
+
+    // Clear the Metatag caches.
+    metatag_flush_caches();
+    // Clear the page caches.
+    backdrop_flush_all_caches();
+
+    // Dump out the current config, to aid with debugging.
+    $this->verbose('<pre>' . print_r($config, TRUE) . '</pre>');
+
+    // Load the front page.
+    $this->backdropGet('<front>');
+    $this->assertResponse(200);
+
+    // Confirm that the Generator tag no longer exists.
+    $xpath = $this->xpath("//meta[@name='generator']");
+    $this->assertEqual(count($xpath), 0, 'No generator meta tag found.');
+
+    // Tell Metatag to leave core's meta tags in place.
+    config_set('metatag.settings', 'leave_core_tags', TRUE);
+
+    // Clear the Metatag caches.
+    metatag_flush_caches();
+    // Clear the page caches.
+    backdrop_flush_all_caches();
+
+    // Load the front page again.
+    $this->backdropGet('<front>');
+    $this->assertResponse(200);
+
+    // Confirm that the generator tag provided by core again. Core uses the
+    // meta tag name "Generator" with a capital G.
+    $xpath = $this->xpath("//meta[@name='Generator']");
+    $this->assertEqual(count($xpath), 1, 'Exactly one generator meta tag found.');
+    $this->assertEqual($xpath[0]['content'], $generator_core);
+
+    // Check that core's X-Generator header is the default.
+    $this->assertEqual($this->backdropGetHeader('X-Generator'), $generator_core, 'Default X-Generator HTTP header set.');
+  }
+
+}

@@ -1,0 +1,314 @@
+<?php
+/**
+ * @file
+ * Contains install and update functions for Views.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function views_install() {
+  module_set_weight('views', 10);
+}
+
+/**
+ * Implements hook_schema().
+ */
+function views_schema() {
+  $schema['cache_views'] = backdrop_get_schema_unprocessed('system', 'cache');
+  $schema['cache_views']['description'] = 'Cache table for Views to store loaded view configurations.';
+
+  $schema['cache_views_data'] = backdrop_get_schema_unprocessed('system', 'cache');
+  $schema['cache_views_data']['description'] = 'Cache table for views to store pre-rendered queries, results, and display output.';
+  $schema['cache_views_data']['fields']['serialized']['default'] = 1;
+
+  return $schema;
+}
+
+/**
+ * @addtogroup updates-7.x-to-1.x
+ * @{
+ */
+
+/**
+ * Convert default views to configuration files.
+ */
+function views_update_1000() {
+  // This update removed. Updates for default views are in individual modules.
+}
+
+/**
+ * Convert available database views to configuration files.
+ */
+function views_update_1001() {
+  if (db_table_exists('views_view')) {
+    $views = db_query("SELECT * FROM {views_view}");
+    foreach ($views as $view) {
+      $view = (array) $view;
+      $view['display'] = array();
+      if (empty($view['human_name'])) {
+        $view['human_name'] = $view['name'];
+      }
+      $displays = db_query("SELECT * FROM {views_display} WHERE vid = :vid ORDER BY position ASC", array(':vid' => $view['vid']));
+      foreach ($displays as $display) {
+        $display = (array) $display;
+        $display['display_options'] = unserialize($display['display_options']);
+        $id = $display['id'];
+        unset($display['id']);
+        unset($display['vid']);
+        unset($display['position']);
+        $view['display'][$id] = $display;
+      }
+      unset($view['vid']);
+      $config = config('views.view.' . $view['name']);
+      $config->setData($view);
+      $config->save();
+    }
+  }
+}
+
+/**
+ * Drop Views tables that were converted to configuration files.
+ *
+ * This update is separate from views_update_1001 so that other modules may read
+ * the views_view and views_display tables before they are dropped using
+ * hook_update_dependencies() to come between these two updates.
+ */
+function views_update_1002() {
+  if (db_table_exists('views_view')) {
+    db_drop_table('views_view');
+    db_drop_table('views_display');
+  }
+}
+
+/**
+ * Update Views variables to use configuration files.
+ */
+function views_update_1003() {
+  $update_variables = array(
+    'views_exposed_filter_any_label' => 'new_any',
+    'views_show_additional_queries' => FALSE,
+    'views_sql_signature' => FALSE,
+    'views_devel_output' => FALSE,
+    'views_devel_region' => 'footer',
+    'views_display_extenders' => array(),
+    'views_field_rewrite_elements' => array(
+      '' => t('- Use default -'),
+      '0' => t('- None -'),
+      'div' => 'DIV',
+      'span' => 'SPAN',
+      'h1' => 'H1',
+      'h2' => 'H2',
+      'h3' => 'H3',
+      'h4' => 'H4',
+      'h5' => 'H5',
+      'h6' => 'H6',
+      'p' => 'P',
+      'strong' => 'STRONG',
+      'em' => 'EM',
+    ),
+  );
+
+  // Update the main views module variables.
+  $config = config('views.settings');
+  foreach ($update_variables as $name => $default) {
+    $value = update_variable_get($name, $default);
+    $name = str_replace('views_', '', $name);
+    $config->set($name, $value);
+  }
+  $config->save();
+
+  // Delete the updated and unneeded variables.
+  $delete_variables = array_keys($update_variables);
+  $delete_variables[] = 'views_skip_cache';
+  db_delete('variable')
+    ->condition('name', $delete_variables, 'IN')
+    ->execute();
+}
+
+/**
+ * Replace the frontpage view with promoted.
+ */
+function views_update_1004() {
+  // If the old frontpage view is still disabled, delete it.
+  if (config_get('views.view.frontpage', 'disabled') === TRUE) {
+    $config_frontpage = config('views.view.frontpage');
+    $config_frontpage->delete();
+  }
+  // See if there is already a promoted view on this site.
+  $config_promoted = config('views.view.promoted');
+  if ($config_promoted->isNew()) {
+    // If not, create the new promoted view and mark it disabled.
+    $path = backdrop_get_path('module', 'node') . '/config/';
+    $contents = file_get_contents($path . 'views.view.promoted.json');
+    $data = json_decode($contents, TRUE);
+    $config_promoted->setData($data);
+    $config_promoted->set('disabled', TRUE);
+    $config_promoted->save();
+  }
+}
+
+/**
+ * Set all grid style Views to use the deprecated table if not set already.
+ */
+function views_update_1005() {
+  $configs = config_get_names_with_prefix('views.view.');
+
+  foreach ($configs as $config_file) {
+    $config = config($config_file);
+    $displays = $config->get('display');
+    foreach ($displays as $display => $display_details) {
+      if (!isset($display_details['display_options']['style_plugin']) || $display_details['display_options']['style_plugin'] != 'grid') {
+        continue;
+      }
+      if (!empty($display_details['display_options']['style_options']['deprecated_table'])) {
+        continue;
+      }
+      $config->set('display.' . $display . '.display_options.style_options.deprecated_table', '1');
+    }
+    $config->save();
+  }
+
+}
+
+/**
+ * Remove headers field from cache tables.
+ *
+ * @see https://www.drupal.org/node/1154830.
+ */
+function views_update_1006() {
+  if (db_field_exists('cache_views', 'headers')) {
+    db_drop_field('cache_views', 'headers');
+  }
+  if (db_field_exists('cache_views_data', 'headers')) {
+    db_drop_field('cache_views_data', 'headers');
+  }
+}
+
+/**
+ * Remove obsolete variable from config.
+ */
+function views_update_1007() {
+  config_clear('views.settings', 'no_javascript');
+}
+
+/**
+ * Update all grid Views to use the backwards-compatible unresponsive option.
+ */
+function views_update_1008() {
+  $view_names = config_get_names_with_prefix('views.view.');
+  foreach ($view_names as $view_name) {
+    $config = config($view_name);
+    $displays = $config->get('display');
+    foreach ($displays as $display => $display_details) {
+      if (!isset($display_details['display_options']['style_plugin']) || $display_details['display_options']['style_plugin'] != 'grid') {
+        continue;
+      }
+      if (isset($display_details['display_options']['style_options']['unresponsive'])) {
+        continue;
+      }
+      $config->set('display.' . $display . '.display_options.style_options.unresponsive', 1);
+    }
+    $config->save();
+  }
+}
+
+/**
+ * Enable ajax history for all Views that used Views Ajax History contrib
+ * module, and disable contrib module.
+ */
+function views_update_1009() {
+  $views = config_get_names_with_prefix('views.view');
+  $views_ajax_history = module_exists('views_ajax_history');
+  foreach ($views as $view_name) {
+    $has_changes = FALSE;
+    $config = config($view_name);
+    $use_ajax_default = $config->get('display.default.display_options.use_ajax');
+    $displays = $config->get('display');
+    foreach ($displays as $display_name => $display_config) {
+      if (isset($display_config['display_options']['use_ajax']) && $display_config['display_options']['use_ajax'] == FALSE) {
+        continue;
+      }
+      if ($use_ajax_default || !empty($display_config['display_options']['use_ajax'])) {
+        // Set the value based on whether views_ajax_history module was enabled.
+        $config->set('display.' . $display_name . '.display_options.enable_ajax_history', $views_ajax_history);
+        $config->set('display.' . $display_name . '.display_options.exclude_ajax_args', '');
+        $has_changes = TRUE;
+      }
+    }
+
+    if ($has_changes) {
+      $config->save();
+    }
+  }
+
+  // Remove the entry for the views_ajax_history module in the system table.
+  // This will "disable" the module if present. No other configuration was
+  // present for this module.
+  $module = db_query("SELECT name FROM {system} WHERE name = 'views_ajax_history' AND type = 'module'")->fetchField();
+  if ($module) {
+    $path = backdrop_get_path('module', 'views_ajax_history');
+    db_query("DELETE FROM {system} WHERE name = 'views_ajax_history' AND type = 'module'");
+    backdrop_set_message(t('The contributed module %module has been located at %path. The module has been disabled, since its functionality is now provided by Backdrop core. It is recommended that you remove this module from your site.', array(
+      '%module' => 'Views Ajax History',
+      '%path' => BACKDROP_ROOT . '/' . $path,
+    )), 'warning');
+  }
+}
+
+/**
+ * Use new responsive table column UI rather than custom css class.
+ */
+function views_update_1010() {
+  $views_updated = 0;
+  $view_names = config_get_names_with_prefix('views.view.');
+  foreach ($view_names as $view_name) {
+    $config = config($view_name);
+    $view_updated = FALSE;
+    $displays = $config->get('display');
+    foreach ($displays as $display_key => $display_details) {
+      $fields = $display_details['display_options']['fields'] ?? NULL;
+      $style = $display_details['display_options']['style_plugin'] ?? NULL;
+      if (!$fields || $style !== 'table') {
+        continue;
+      }
+      foreach ($fields as $field_key => $field) {
+        if (!isset($field['element_label_class'])) {
+          continue;
+        }
+        $label_classes = explode(' ', $field['element_label_class']);
+        $has_low = in_array('priority-low', $label_classes);
+        $has_medium = in_array('priority-medium', $label_classes);
+        $label_classes = array_values(array_filter($label_classes, function ($p) {
+          return $p !== 'priority-low' && $p !== 'priority-medium';
+        }));
+        if ($has_low || $has_medium) {
+          $updated_classes = implode(' ', $label_classes);
+          $config->set('display.' . $display_key . '.display_options.fields.' . $field_key . '.element_label_class', $updated_classes);
+          $responsive = '';
+          if ($has_low) {
+            $responsive = 'priority-low';
+          }
+          if ($has_medium) {
+            $responsive = 'priority-medium';
+          }
+          $config->set('display.' . $display_key . '.display_options.style_options.info.' . $field_key . '.responsive', $responsive);
+          $view_updated = TRUE;
+        }
+      }
+    }
+    if ($view_updated) {
+      $views_updated++;
+      $config->save();
+    }
+  }
+
+  if ($views_updated) {
+    return format_plural($views_updated, 'One view updated to move responsive table classes to the table display settings.', '@count views updated to move responsive table classes to the table display settings.');
+  }
+}
+
+/**
+ * @} End of "addtogroup updates-7.x-to-1.x"
+ * The next series of updates should start at 2000.
+ */

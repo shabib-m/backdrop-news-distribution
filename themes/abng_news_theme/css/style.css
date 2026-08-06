@@ -1,0 +1,466 @@
+body {
+  font-family: "Cairo", sans-serif;
+}
+.block-title {
+  font-family: "Cairo", sans-serif;
+  position: relative; 
+  display: inline-block; /* Keeps the container (and border) matching the text width */
+  padding-bottom: 8px; 
+  margin-bottom: 20px;
+}
+.block-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  
+  /* التوسيط في المنتصف */
+  left: 44%;
+  transform: translateX(-50%);
+  
+  /* التحكم في طول الخط المنقط */
+  width: 88%;           
+  
+  /* بديل الخلفية: استخدام إطار منقط سفلي */
+  border-bottom: 5px dotted #307c67; 
+}
+
+/* إلغاء كود DaisyUI الافتراضي للحالة النشطة والضغط في قائمة الفوتر */
+footer .menu li > :not(ul, .menu-title, details, .btn):active, 
+footer .menu li > :not(ul, .menu-title, details, .btn).active, 
+footer .menu li > details > summary:active {
+    --tw-bg-opacity: 0 !important;
+    box-shadow: none !important;
+}
+
+/* الحفاظ على مظهر مخصص ونظيف جداً عند التمرير بالماوس فقط */
+footer .menu li > :not(ul, .menu-title, details, .btn):hover {
+    background-color: rgba(243, 244, 246, 0.8) !important; /* خلفية رمادية خفيفة جداً عند الـ Hover */
+    color: #000000 !important; /* تحول النص للأسود */
+}
+
+.footer-menu, .footer-menu li > a.active {
+  background-color: #f9f9f9 !important; /* الحفاظ على الخلفية شفافة */
+  border-bottom: 4px solid #307c67; /* تثبيت اللون الأخضر الزيتي للإطار السفلي */
+  color: #2b2d30 !important; /* الحفاظ على لون النص الرمادي الطبيعي */
+}
+
+.block-menu-menu-alaqsam-alakhbaryt .menu li > a:active {
+   background-color: transparent !important; /* الحفاظ على الخلفية شفافة */
+   background: none !important; /* إزالة أي خلفية مضافة */
+}
+
+.block-menu-menu-tab-na-ly  li{
+  border-radius: 9999px;
+  border-bottom: 4px solid #307c67; /* تثبيت اللون الأخضر الزيتي للإطار السفلي */
+}
+
+/* إجبار صندوق Powered by على التحرر من قيود العمود والتوسط الكامل أسفل الفوتر */
+footer .block-system-powered-by,
+footer [class*="block-system-powered-by"] {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    
+    /* فرض التمدد العريض وإلغاء محاذاة العمود الأيمن */
+    width: 100% !important;
+    max-width: 100% !important;
+    grid-column: 1 / -1 !important; /* إذا كان الفوتر يعتمد على Grid، هذا السطر يجعله يمتد بعرض الصفحة بالكامل */
+    clear: both !important; /* إلغاء أي التفاف لليمين موروث من النظام */
+    
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-top: 2rem !important;
+}
+
+/* استهداف النص والرابط الداخلي لـ Backdrop لضمان السنتر */
+footer .block-system-powered-by .block-content,
+footer .block-system-powered-by p,
+footer .block-system-powered-by a {
+    display: inline-block !important;
+    text-align: center !important;
+    width: auto !important;
+    margin: 0 auto !important;
+    float: none !important;
+}
+.card-side {
+  border:#2b2d30 1px 0 1px 1px solid !important;
+}
+
+.views-view-grid .views-row, .views-view-grid .views-grid-box {
+	padding: 0;
+	border: none !important;
+}
+
+
+/* 1. استهداف الحاوية الأبوية الكبرى المشتركة للمكوّن وحصر عرضها بالكامل */
+.block-system-breadcrumb {
+	border: 1px solid #afafaf;
+}
+.breadcrumb {
+	margin: 8px 5px 2px;
+}
+/* إخفاء الفاصل الافتراضي المطبوع برمجياً */
+.breadcrumb-separator {
+    display: none !important;
+}
+
+/* إضافة الفاصل الجديد / باستخدام CSS */
+.breadcrumb li:not(:last-child):after {
+    content: "/";
+    padding: 0 8px;
+    color: #50545a; /* لون رمادي ناعم */
+    font-size: 20px; /* يمكنك تكبير أو تصغير الرقم حسب رغبتك */
+}
+
+
+.block-system-title-combo,
+div[class*="block-system-title-combo"],
+.l-top .block-system-title-combo {
+    /* max-w-4xl !important; */
+    width: 100% !important;
+    margin: 0 auto !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    float: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important; /* تراصف العناصر لليمين بالكامل */
+    text-align: right !important;
+}
+
+/* 2. ضبط العنوان الرئيسي h1 ليلتزم بالعرض الداخلي الجديد */
+h1.page-title,
+.block-system-title-combo h1.page-title {
+    width: 100% !important;
+    font-size: 1.15rem !important; /* خط صحفي عريض ومتناسق */
+    font-weight: 900 !important;
+    color: #454b59 !important; /* أسود داكن ناعم */
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+    text-align: right !important;
+}
+
+/* 3. تنظيف وضبط مسار التنقل المدمج تحته مباشرة */
+.block-system-title-combo nav.breadcrumb,
+.block-system-title-combo .breadcrumb {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.block-system-title-combo nav.breadcrumb ol {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: right !important;
+    gap: 0.5rem !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none !important;
+}
+
+/* تنسيق شريط التبويبات الإدارية (عرض، تحرير، Devel) */
+.tabs.primary {
+    display: flex !important;
+    gap: 10px !important;
+    border-bottom: 2px solid #f3f4f6 !important; /* خط سفلي ناعم جداً */
+    margin-bottom: 20px !important;
+    padding: 0 !important;
+    list-style: none !important;
+    max-width: 1152px; /* محاذاة مع عرض المقال */
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    margin-top: 1rem !important;
+}
+
+.tabs.primary li {
+    margin: 0 !important;
+}
+
+.tabs.primary li a {
+    display: block !important;
+    padding: 8px 16px !important;
+    background-color: #f9fafb !important; /* خلفية رمادية فاتحة جداً */
+    color: #6b7280 !important; /* لون نص هادئ */
+    border-radius: 8px 8px 0 0 !important; /* حواف علوية دائرية فقط */
+    font-size: 13px !important;
+    font-weight: bold !important;
+    text-decoration: none !important;
+    border: 1px solid transparent !important;
+    transition: all 0.2s ease !important;
+}
+
+/* حالة التبويب النشط (الصفحة التي تقف عليها حالياً) */
+.tabs.primary li.active a {
+    background-color: #307c67 !important; /* لون هويتك الأخضر الزيتي */
+    color: #ffffff !important; /* نص أبيض */
+    border-color: #307c67 !important;
+}
+
+/* تأثير التمرير بالماوس */
+.tabs.primary li a:hover:not(.active) {
+    background-color: #e5e7eb !important;
+    color: #111827 !important;
+}
+
+/* استهداف الصورة البارزة للمقال مباشرة وإجبارها على التمدد الكامل والارتفاع الاحترافي */
+.node-news .field-name-field-swrt-alkhbr-alryysyt img,
+.node-full .field-name-field-swrt-alkhbr-alryysyt img,
+article img[class*="field-swrt-alkhbr-alryysyt"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 480px !important; /* ارتفاع صحفي ممتاز وممتد على الكمبيوتر */
+    object-cover: cover !important; /* لمنع تمطط الصورة والحفاظ على أبعادها الحقيقية */
+    object-position: center !important; /* لتوسيط الحدث الإخباري في المنتصف دائماً */
+    border-radius: 1.5rem 1.5rem 0 0  !important; /* منحها نفس الزوايا الدائرية الحديثة لموقعك */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important; /* ظل ناعم يفصلها عن الخلفية */
+    margin-bottom: 2rem !important; /* مسافة مريحة تفصل الصورة عن بداية متن الخبر */
+}
+
+/* ضبط استجابة ارتفاع الصورة تلقائياً على شاشات الجوال الصغيرة */
+@media (max-width: 768px) {
+    .node-news .field-name-field-swrt-alkhbr-alryysyt img,
+    .node-full .field-name-field-swrt-alkhbr-alryysyt img {
+        height: 250px !important; /* ارتفاع أنيق ومناسب لشاشات الهواتف */
+        border-radius: 1rem !important;
+    }
+}
+
+.field-name-body {
+	line-height: 2.5;
+  margin:10px 0;
+}
+.field-name-field-news-source {
+  margin: 45px 0 5px;
+  color: #307c67;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+.field-name-field-news-source .field-label{
+  margin: 4px 0 5px;
+}
+.field-name-field-news-source .field-item {
+	margin: 0 10px;
+	padding: 1px 15px 5px;
+	background-color: #c5df93;
+	border-radius: 15px;
+	border: 1px solid #7c8d5c;
+  display: inline-block;
+}
+/* حقن رمز الهاشتاق # تلقائياً لمرة واحدة فقط قبل اسم الكلمة */
+.field-name-field-news-source .field-item a::before {
+    content: "# " !important; /* طباعة الرمز مع مسافة مجهرية ناعمة */
+    color: #307c67 !important; /* نفس لون الخط الأخضر الزيتي الخاص بهويتك */
+    font-weight: bold !important;
+    opacity: 0.85 !important; /* شفافية بسيطة ليعطي مظهراً عصرياً */
+}
+/* 3. تنسيق وهيكلة منطقة الشريط الجانبي واجبارها على التحرك والثبات مع النزول (Sticky) */
+.layout--moscone-flipped .l-sidebar {
+    width: 30% !important; /* الشريط الجانبي يأخذ 30% من العرض */
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important; /* مسافة عمودية بين الصناديق الجانبية */
+    
+    /* سحر التثبيت مع النزول عبر Tailwind / CSS */
+    position: -webkit-sticky !important; /* لدعم متصفحات سفاري وآبل */
+    position: sticky !important; 
+    top: 100px !important; /* المسافة الفاصلة بين الشريط الجانبي والقائمة العلوية المثبتة للهيدر عند النزول */
+    height: fit-content !important; /* إجبار الحاوية على أخذ حجم محتواها فقط لتعمل خاصية الـ sticky بشكل سليم */
+}
+
+
+
+
+/* ========================================================
+   1. التنسيقات العامة للموقع وشريط الإدارة (Admin Bar)
+   ======================================================== */
+
+/* عندما يكون شريط الإدارة مفعلاً، يتم دفع الهيدر المثبت لأسفل تلقائياً */
+body.admin-bar header.navbar.sticky,
+.admin-bar header.navbar {
+  top: 30px !important; /* هذا هو الارتفاع الافتراضي لشريط الإدارة الأسود في باك دروب */
+  transition: top 0.2s ease;
+}
+
+/* إصلاح التموضع عند تصغير الشاشة إذا تغير حجم شريط الأدمن */
+@media (max-width: 768px) {
+  body.admin-bar header.navbar.sticky {
+    top: 30px !important; /* تأمين التباعد المريح على شاشات الجوال أيضاً */
+  }
+}
+
+
+#admin-bar .admin-bar-link-icon {
+  float: inline-start;
+}
+
+.outline-cyan-500 {
+  color: #ffffff;
+  border-color: #307c67;
+  border-width: 3px;
+}
+
+.outline-cyan-500:hover {
+  background-color: rgba(3,95,69,0.82) !important;
+  color: #fff;
+  border-color: #307c67 !important;
+}
+
+/* ========================================================
+   2. تطهير وإخفاء أدوات التحكم التلقائية لنواة باك دروب
+   ======================================================== */
+.menu-toggle-button, 
+#menu-toggle-state,
+.menu-toggle-state,
+.mobile-menu-wrapper .menu-toggle-button,
+.mobile-menu-wrapper #menu-toggle-state,
+.mobile-menu-wrapper .menu-toggle-state,
+.mobile-user-links .menu-toggle-button,
+.mobile-user-links #menu-toggle-state,
+.mobile-user-links .menu-toggle-state {
+  display: none !important;
+}
+
+/* التعديل السحري: إخفاء حاوية الكمبيوتر بالكامل بدلاً من إخفاء الـ ul مباشرة لمنع التداخل */
+@media (max-width: 1023px) {
+  .main-desktop-menu {
+    display: none !important;
+  }
+}
+
+/* ========================================================
+   3. تنسيق روابط القائمة الرئيسية داخل الهامبرغر (الجوال)
+   ======================================================== */
+/* إجبار الـ ul الحامل لكلاس main-menu-ul على الظهور عمودياً داخل صندوق الهاتف المنسدل */
+.mobile-main-links-container ul,
+.mobile-main-links-container ul.main-menu-ul {
+  display: flex !important; /* كسر الـ none القديم وإجبارها على الظهور */
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 0.5rem !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.mobile-main-links-container ul li {
+  display: block !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.mobile-main-links-container ul li a {
+  border-bottom-width: 0px !important; /* إلغاء الخط السفلي الخاص بالكمبيوتر */
+  width: 100% !important;
+  text-align: right !important;
+  display: block !important;
+  padding: 0.6rem 1rem !important;
+  color: #4b5563 !important;
+}
+
+.mobile-main-links-container ul li a:hover {
+  background-color: #f3f4f6 !important;
+  border-radius: 0.5rem;
+  color: #307c67 !important;
+}
+
+/* ========================================================
+   4. حل مشكلة ميلان أزرار المستخدم (حسابي/خروج) في الجوال
+   ======================================================== */
+/* استهداف موسع ومكثف لجميع وسوم القائمة الداخلية لتصفير الإزاحة تماماً */
+.mobile-user-links,
+.mobile-user-links div,
+.mobile-user-links ul,
+.mobile-user-links ul.menu,
+.mobile-user-links ul li {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+  width: 100% !important;
+  padding: 0 !important;       /* تصفير كامل للـ Padding المسبب للميلان */
+  padding-right: 0 !important; /* إغلاق منافذ الـ RTL الافتراضية في باك دروب */
+  padding-left: 0 !important;
+  margin: 0 !important;        /* تصفير الهوامش تماماً */
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+  list-style: none !important;
+  list-style-type: none !important;
+}
+
+.mobile-user-links ul li {
+  display: block !important;
+}
+
+/* تنسيق شكل الأزرار المفرغة بداخل الصندوق لتبدو مستقيمة ومتوازنة */
+.mobile-user-links ul li a,
+.mobile-user-links .menu li a {
+  background-color: transparent !important;
+  color: #307c67 !important;
+  border: 1px solid #307c67 !important;
+  border-radius: 0.5rem !important;
+  text-align: center !important; /* توسيط النص الداخلي */
+  padding: 0.5rem 1rem !important;
+  display: block !important;
+  width: 100% !important;
+  box-sizing: border-box !important; /* ضمان احتواء الحدود داخل المربع */
+  font-size: 0.875rem !important;
+  font-weight: bold !important;
+  margin: 0 !important;
+}
+
+.mobile-user-links ul li a:hover,
+.mobile-user-links .menu li a:hover {
+  background-color: #307c67 !important;
+  color: white !important;
+}
+
+/* ========================================================
+   5. حركية الـ Dropdown وتنسيقات قائمة الكمبيوتر (Desktop)
+   ======================================================== */
+.dropdown.menu-open .dropdown-content {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.user-desktop-dropdown ul {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.25rem !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.user-desktop-dropdown ul li {
+  width: 100% !important;
+}
+
+.user-desktop-dropdown ul li a {
+  display: block !important;
+  width: 100% !important;
+  text-align: right !important;
+  padding: 0.6rem 1rem !important;
+  color: #4b5563 !important;
+  background-color: transparent !important;
+  border-radius: 0.5rem !important;
+  border-width: 0px !important;
+}
+
+.user-desktop-dropdown ul li a:hover {
+  background-color: #f3f4f6 !important;
+  color: #307c67 !important;
+}
+
+/* منع نص المقال من التمدد الرأسي لإجبار المحتوى بالكامل على الاستقرار في الأسفل */
+.card.image-full .card-body p {
+  flex-grow: 0 !important;
+  margin-bottom: 1rem !important;
+}
+
+/* تأمين تغطية التدرج الظلي الأسود في القاع لحماية وضوح النص الأبيض */
+.card.image-full .card-body {
+  justify-content: flex-end !important;
+}

@@ -1,0 +1,15 @@
+name = Custom breadcrumbs for panels - Not ported yet
+package = Custom breadcrumbs
+dependencies[] = custom_breadcrumbs
+dependencies[] = panels
+dependencies[] = ctools
+dependencies[] = page_manager
+hidden = 1
+description = Provides custom breadcrumbs for panels pages.
+core = 7.x
+configure = admin/config/user-interface/custom-breadcrumbs
+
+; Added by Backdrop CMS packaging script on 2025-11-25
+project = custom_breadcrumbs
+version = 1.x-2.0.0
+timestamp = 1764082900

@@ -1,0 +1,131 @@
+<?php
+
+/**
+ * @file
+ * Install file for the custom_breadcrumbs_views module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function custom_breadcrumbs_views_install() {
+
+  $t = get_t();
+
+  // Search for Views breadcrumbs in existing {custom_breadcrumb} and move to
+  // new table.
+  backdrop_set_message($t('Looking for views breadcrumbs to copy from {custom_breadcrumb}...'));
+  $result = db_query("SELECT * FROM {custom_breadcrumb} WHERE node_type = :node_type", array(':node_type' => 'Views Page'));
+  $found = 0;
+  foreach ($result as $breadcrumb) {
+    $start = strpos($breadcrumb->paths, "\n");
+    $views_path = backdrop_substr($breadcrumb->paths, 0, $start);
+    $title = backdrop_substr($breadcrumb->titles, strpos($breadcrumb->titles, "\n") + 1);
+    $newpath = backdrop_substr($breadcrumb->paths, strpos($breadcrumb->paths, "\n") + 1);
+
+    db_insert('custom_breadcrumbs_views')
+      ->fields(array(
+        'titles' => $title,
+        'paths' => $newpath,
+        'views_path' => $views_path,
+        'set_active_menu' => $breadcrumb->set_active_menu,
+        'langcode' => $breadcrumb->langcode,
+      ))
+      ->execute();
+    backdrop_set_message($t('copied path ') . $views_path);
+    ++$found;
+  }
+
+  if ($found > 0) {
+    backdrop_set_message(format_plural($found, 'Copied 1 breadcrumb.', 'Copied @count breadcrumbs.'));
+    backdrop_set_message($t('You can now delete the old views breadcrumb from <a href="@link">admin/build/custom_breadcrumbs</a>. They will be listed with title Views Page and page type node.', array('@link' => url('admin/structure/custom_breadcrumbs'))));
+  }
+  else {
+    backdrop_set_message($t('No views breadcrumbs were found in {custom_breadcrumbs}'));
+  }
+}
+
+/**
+ * Implements hook_schema().
+ */
+function custom_breadcrumbs_views_schema() {
+  $schema['custom_breadcrumbs_views'] = array(
+    'description' => 'Stores custom breadcrumb trail overrides for views pages.',
+    'fields' => array(
+      'bid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Unique identifier for the {custom_breadcrumbs_views}.',
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => FALSE,
+        'description' => 'An optional name for the custom breadcrumb.',
+      ),
+      'titles' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'A return-delimited list of titles for the breadcrumb links.',
+      ),
+      'paths' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'description' => 'A return-delimited list of url paths for the breadcrumb links.',
+      ),
+      'views_path' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'description' => 'Path to the view for this custom breadcrumb.',
+      ),
+      'langcode' => array(
+        'type' => 'varchar',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The language this breadcrumb is for; if blank, the breadcrumb will be used for unknown languages.',
+      ),
+    ),
+    'indexes' => array(
+      'langcode' => array('langcode'),
+      'vpath_langcode' => array('views_path', 'langcode'),
+    ),
+    'primary key' => array('bid'),
+  );
+  return $schema;
+}
+
+/**
+ * Rename language column to langcode and update indexes.
+ */
+function custom_breadcrumbs_views_update_1000() {
+  // Rename language column to langcode.
+  db_drop_index('custom_breadcrumbs_views', 'language');
+  db_drop_index('custom_breadcrumbs_views', 'vpath_language');
+  $langcode_spec = array(
+    'type' => 'varchar',
+    'length' => 12,
+    'not null' => TRUE,
+    'default' => '',
+    'description' => 'The language this breadcrumb is for; if blank, the breadcrumb will be used for unknown languages.',
+  );
+  $indexes_spec = array(
+    'langcode' => array('langcode'),
+    'vpath_langcode' => array('views_path', 'langcode'),
+  );
+  db_change_field('custom_breadcrumbs_views', 'language', 'langcode', $langcode_spec, $indexes_spec);
+}
+
+  /**
+  * Remove unneeded PHP visibility field.
+  */
+  function custom_breadcrumbs_views_update_2000 () {
+    if (db_field_exists('custom_breadcrumbs_views', 'visibility_php')) {
+      db_drop_field('custom_breadcrumbs_views', 'visibility_php');
+    }
+  }
