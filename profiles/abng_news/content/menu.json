@@ -16,5 +16,62 @@
     "link_title": "Contact",
     "weight": 2,
     "menu_name": "main-menu"
+  },
+  {
+    "link_path": "node/4",
+    "link_title": "احدث الاخبار",
+    "weight": 2,
+    "menu_name": "menu-alaqsam-alakhbaryt"
+  },
+  {
+    "link_path": "node/4",
+    "link_title": "الاخبار المحلية",
+    "weight": 2,
+    "menu_name": "menu-alaqsam-alakhbaryt"
+  },
+  {
+    "link_path": "node/4",
+    "link_title": "الاخبار المحلية",
+    "weight": 2,
+    "menu_name": "menu-rwabt-mhmh",
+    "attributes": {
+      "class": "footer-menu"
+    }    
+  },
+  {
+    "link_path": "node/4",
+    "link_title": "الاخبار المحلية",
+    "weight": 2,
+    "menu_name": "menu-rwabt-mhmh",
+    "attributes": {
+      "class": "footer-menu"
+    }    
+  },
+  {
+    "link_path": "node/4",
+    "link_title": "X",
+    "weight": 2,
+    "menu_name": "menu-tab-na-ly",
+    "attributes": {
+      "class": "btn-social-x"
+    }
+  },
+  {
+    "link_path": "node/4",
+    "link_title": "S",
+    "weight": 2,
+    "menu_name": "menu-tab-na-ly",
+    "attributes": {
+      "class": "btn-social-x"
+    }    
+  },
+  {
+    "link_path": "node/4",
+    "link_title": "FB",
+    "weight": 2,
+    "menu_name": "menu-tab-na-ly",
+    "attributes": {
+      "class": "btn-social-x"
+    }    
   }
 ]

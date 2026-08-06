@@ -1,0 +1,36 @@
+{
+    "_config_name": "field.instance.node.news.field_promoted_headline",
+    "field_name": "field_promoted_headline",
+    "entity_type": "node",
+    "bundle": "news",
+    "label": "خبر رئيسي",
+    "widget": {
+        "weight": "2",
+        "type": "options_onoff",
+        "module": "options",
+        "active": 1,
+        "settings": {
+            "display_label": 1
+        }
+    },
+    "description": "",
+    "required": 0,
+    "deleted": 0,
+    "default_value": [
+        {
+            "value": 0
+        }
+    ],
+    "default_value_function": null,
+    "settings": {
+        "user_register_form": false
+    },
+    "display": {
+        "default": {
+            "label": "hidden",
+            "type": "hidden",
+            "weight": "7",
+            "settings": []
+        }
+    }
+}

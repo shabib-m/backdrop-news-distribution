@@ -1,4 +1,4 @@
-name = Abng news
+name = توزيعة الاخبار
 description = Install abng_news.
 version = BACKDROP_VERSION
 backdrop = 1.x
@@ -34,7 +34,7 @@ dependencies[] = file
 dependencies[] = update
 dependencies[] = views
 dependencies[] = views_ui
+dependencies[] = menu_attributes
 
 
-; themes[] = basis
-; themes[] = seven
+distribution_name = توزيعة الاخبار

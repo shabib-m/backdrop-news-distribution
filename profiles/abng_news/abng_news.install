@@ -1,4 +1,4 @@
-<?php
+<?php 
 /**
  * @file
  * Install/uninstall and update functions for the abng_news installation profile.
@@ -47,6 +47,27 @@ function abng_news_install() {
     'value' => array('card' => 'card'),
   );
   $promoted_view->save();
+
+  // Modify the default promoted view to exclude cards.
+  $promoted_view = views_get_view('promoted');
+  $promoted_view->display['default']->display_options['filters']['type'] = array(
+    'id' => 'type',
+    'table' => 'node',
+    'field' => 'type',
+    'operator' => 'not in',
+    'value' => array('card' => 'card'),
+  );
+  $promoted_view->save();
+  // Modify the default taxonomy_term_1 view to exclude cards.
+  $taxonomy_term_1_view = views_get_view('taxonomy_term_1');
+  $taxonomy_term_1_view->display['default']->display_options['filters']['type'] = array(
+    'id' => 'type',
+    'table' => 'node',
+    'field' => 'type',
+    'operator' => 'in',
+    'value' => array('news' => 'news'),
+  );
+  $taxonomy_term_1_view->save();
 
   // Enable default permissions for system roles.
   $filtered_html_permission = filter_permission_name($filtered_html_format);
@@ -110,4 +131,5 @@ function abng_news_install() {
   config_set('system.core', 'preprocess_css', '1');
   config_set('system.core', 'preprocess_js', '1');
   config_set('system.core', 'cache', '1');
+
 }

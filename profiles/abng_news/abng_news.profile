@@ -100,7 +100,13 @@ function abng_news_import_default_content() {
           'uid' => $data['uid'],
           'langcode' => LANGUAGE_NONE,
         ));
-
+        // 2. إضافة حقل العنوان البارز (Boolean 0 أو 1) المجلوب من الـ JSON
+        // نستخدم isset للتأكد من وجود المفتاح في ملف الـ JSON لمنع ظهور تحذيرات برمجية
+        if (isset($data['field_promoted_headline'])) {
+          $node->field_promoted_headline[LANGUAGE_NONE][0] = array(
+            'value' => (int) $data['field_promoted_headline'], // تحويل القيمة إلى رقم صحيح (0 أو 1)
+          );
+        }
         // 2. إسناد حقل الـ Body للكائن بشكل منفصل ومحمي
         $node->body[LANGUAGE_NONE][0] = array(
           'value' => $data['body'],
@@ -131,7 +137,7 @@ function abng_news_import_default_content() {
             ));
             $file->save();
 
-            // إسناد كائن الصورة المرفقة للـ Node
+            // إسناد كائن الصورة المرفقة للـ Node (الحقل الرئيسي)
             $node->field_image[LANGUAGE_NONE][0] = array(
               'fid' => $file->fid,
               'filename' => $file->filename,
@@ -141,6 +147,35 @@ function abng_news_import_default_content() {
             );
           }
         }
+
+        // ==================== الحقل الثاني: الصورة الثانوية ====================
+        if (!empty($data['secondary_image_filename'])) {
+          $sec_image_filename = $data['secondary_image_filename'];
+          $sec_image_url = BACKDROP_ROOT . '/' . $profile_path . '/images/' . $sec_image_filename;
+
+          if (file_exists($sec_image_url)) {
+            $moved_file_sec = file_unmanaged_copy($sec_image_url, $field_swrt_alkhbr_alryysyt_dir, FILE_EXISTS_REPLACE);
+            
+            $file_sec = entity_create('file', array(
+              'filename' => $sec_image_filename,
+              'uri' => $moved_file_sec,
+              'uid' => 1,
+              'status' => 1,
+            ));
+            $file_sec->save();
+
+            // ربط الحقل الثانوي باسمه المخصص المعتمد في أنواع المحتوى لديك (مثال: field_secondary_image)
+            // تنبيه: تأكد من تطابق اسم الحقل البرمجي تماماً مع الإعدادات في لوحة التحكم
+            $node->field_swrt_alkhbr_alryysyt[LANGUAGE_NONE][0] = array(
+              'fid' => $file_sec->fid,
+              'filename' => $file_sec->filename,
+              'uri' => $file_sec->uri,
+              'filemime' => $file_sec->filemime,
+              'status' => 1,
+            );
+          }
+        }
+
 
         // 5. حفظ الـ Node بالكامل دفعة واحدة وبأمان
         node_save($node);
@@ -154,7 +189,7 @@ function abng_news_import_default_content() {
 
 
 /**
- * دالة استيراد قوائم الموقع الافتراضية من ملف JSON.
+ * دالة استيراد قوائم الموقع الافتراضية من ملف JSON مع دعم خصائص menu_attributes.
  */
 function abng_news_import_default_menus() {
   $profile_path = backdrop_get_path('profile', 'abng_news');
@@ -175,19 +210,107 @@ function abng_news_import_default_menus() {
           'language' => LANGUAGE_NONE,
           'options' => array(),
         );
+
+        // [تحديث] التحقق من وجود خصائص menu_attributes وإسنادها (للرابط وللعنصر الخارجي)
+        if (!empty($link_data['attributes'])) {
+          // 1️⃣ إعداد خصائص الرابط نفسه (Menu link attributes) كما فعلنا سابقاً
+          $item['options']['attributes'] = array();
+          if (!empty($link_data['attributes']['class'])) {
+            $item['options']['attributes']['class'] = is_array($link_data['attributes']['class']) 
+              ? $link_data['attributes']['class'] 
+              : explode(' ', $link_data['attributes']['class']);
+          }
+
+          // 2️⃣ [جديد] إعداد خصائص عنصر القائمة الخارجي <li> (Menu item attributes)
+          if (!empty($link_data['item_attributes'])) {
+            $item['options']['item_attributes'] = array();
+            
+            // معالجة كلاسات عنصر القائمة الخارجي <li>
+            if (!empty($link_data['item_attributes']['class'])) {
+              $item['options']['item_attributes']['class'] = is_array($link_data['item_attributes']['class']) 
+                ? $link_data['item_attributes']['class'] 
+                : explode(' ', $link_data['item_attributes']['class']);
+            }
+
+            // دعم بقية الخصائص لعنصر الـ <li> مثل id أو style أو id المخصص للعنصر
+            $supported_item_attrs = array('id', 'style', 'title');
+            foreach ($supported_item_attrs as $attr) {
+              if (isset($link_data['item_attributes'][$attr])) {
+                $item['options']['item_attributes'][$attr] = $link_data['item_attributes'][$attr];
+              }
+            }
+          }
+
+          // دعم بقية خصائص الرابط القياسية السابقة
+          $supported_attributes = array('id', 'target', 'rel', 'title', 'name', 'style');
+          foreach ($supported_attributes as $attr) {
+            if (isset($link_data['attributes'][$attr])) {
+              $item['options']['attributes'][$attr] = $link_data['attributes'][$attr];
+            }
+          }
+        }
+
         
         // حفظ الرابط في قاعدة البيانات برمجياً وبأمان
         menu_link_save($item);
       }
-        // تحديث كاش القوائم لتظهر الروابط فوراً في الموقع
-        state_set('menu_rebuild_needed', TRUE);
       
-            // تحديث كاش القوائم لتظهر الروابط فوراً
-        state_set('menu_rebuild_needed', TRUE);
-    }  // إغلاق empty($menu_links)
+      // تحديث كاش القوائم لتظهر الروابط فوراً في الموقع (تم إزالة التكرار)
+      state_set('menu_rebuild_needed', TRUE);
+    } 
   
-    // [جديد] مسح شامل لكاش الحقول والمحتوى لضمان ظهور الأقسام والصور فوراً دون تدخل يدوي
+    // مسح شامل لكاش الحقول والمحتوى لضمان ظهور الأقسام والصور فوراً دون تدخل يدوي
     cache_clear_all('*', 'cache_field', TRUE);
     entity_get_controller('node')->resetCache();
   }
+  // abng_news_layout_load_alter();
+  // 1. إعادة بناء وتحديث كاش الأنساق بالكامل (ويشمل الصناديق بداخلها)
+  layout_reset_caches();
+
+  // 2. مسح كاش الحواشي والقوالب لفرض قراءة الكلاسات الديناميكية الجديدة
+  cache_clear_all('*', 'cache_block', TRUE);
+  cache_clear_all('theme_registry', 'cache');
 }
+
+
+/**
+ * Implements hook_layout_load_alter().
+ * دالة لاعتراض الأنساق المستوردة وفرض الكلاسات المخصصة للصناديق من ملف JSON.
+ */
+/**
+ * Implements hook_layout_load_alter().
+ * دالة برمجية آمنة لحقن كلاسات الصناديق دون كسرها أو إخفائها في Backdrop CMS.
+ */
+function abng_news_layout_load_alter(&$layout) {
+  if (!empty($layout->content)) {
+    foreach ($layout->content as $uuid => $block) {
+      // 1. التحقق الآمن من أن الصندوق يمتلك إعدادات نمط مخصصة (Style)
+      if (isset($block->style) && is_object($block->style)) {
+        
+        // جلب الإعدادات الداخلية للنمط المخصص
+        $style_settings = $block->style->settings;
+
+        // 2. التحقق من وجود الكلاسات المحددة في ملف الـ JSON المصدّر
+        if (!empty($style_settings['classes'])) {
+          $classes_input = $style_settings['classes'];
+
+          // تحويل النص إلى مصفوفة إذا كُتبت الكلاسات متبوعة بمسافات
+          $classes_array = is_array($classes_input) ? $classes_input : explode(' ', $classes_input);
+
+          // 3. حقن الكلاسات داخل المصفوفة الرسمية التي يتعرف عليها المحرك المرجعي للنسق
+          if (!isset($layout->content[$uuid]->style->settings['classes'])) {
+            $layout->content[$uuid]->style->settings['classes'] = array();
+          }
+
+          // دمج الكلاسات ومنع تكرارها لضمان استقرار التصميم
+          $layout->content[$uuid]->style->settings['classes'] = array_unique(
+            array_merge($layout->content[$uuid]->style->settings['classes'], $classes_array)
+          );
+        }
+      }
+    }
+  }
+}
+
+
+

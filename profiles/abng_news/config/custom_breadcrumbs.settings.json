@@ -1,0 +1,44 @@
+{
+    "_config_name": "custom_breadcrumbs.settings",
+    "_config_translatables": [
+        "custom_breadcrumb_home"
+    ],
+    "custom_breadcrumb_home": "Home",
+    "custom_breadcrumb_home_link": "<front>",
+    "custom_breadcrumbs_append_page_title": 0,
+    "custom_breadcrumbs_append_page_title_no_link": 0,
+    "custom_breadcrumbs_set_menu_breadcrumb": 0,
+    "custom_breadcrumbs_menu_list": [],
+    "custom_breadcrumbs_set_global_home_breadcrumb": 0,
+    "custom_breadcrumbs_force_active_trail": 0,
+    "custom_breadcrumbs_use_exclude_list": 0,
+    "custom_breadcrumbs_exclude_list": "admin/user/user,user",
+    "custom_breadcrumbs_home_id": 0,
+    "custom_breadcrumbs_home_class": 0,
+    "custom_breadcrumbs_parts_class": 0,
+    "custom_breadcrumbs_even_odd_class": 0,
+    "custom_breadcrumbs_type_class": 0,
+    "custom_breadcrumbs_append_bid_class": 0,
+    "custom_breadcrumbs_taxonomy_use_hierarchy": 1,
+    "custom_breadcrumbs_taxonomy_append_breadcrumb": 0,
+    "custom_breadcrumbs_taxonomy_show_vocabulary": 0,
+    "custom_breadcrumbs_taxonomy_show_current_term": 1,
+    "custom_breadcrumbs_taxonomy_show_current_term_term": 0,
+    "custom_breadcrumbs_taxonomy_include_node_title": 0,
+    "custom_breadcrumbs_taxonomy_session": 0,
+    "custom_breadcrumbs_taxonomy_no_anon_sessions": 0,
+    "custom_breadcrumbs_taxonomy_uncache": 0,
+    "custom_breadcrumbs_taxonomy_views": 0,
+    "custom_breadcrumbs_taxonomy_result_nodes": 0,
+    "custom_breadcrumbs_taxonomy_include_nodes": "0",
+    "custom_breadcrumbs_taxonomy_node_types": {
+        "card": 0,
+        "page": 0,
+        "post": 0
+    },
+    "custom_breadcrumbs_taxonomy_excluded_vocabs": {
+        "tags": 0
+    },
+    "custom_breadcrumbs_none_span": 0,
+    "custom_breadcrumbs_paths_allow_wildcards": 0
+}
