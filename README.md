@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.png" alt="Abng News CMS Logo" width="200">
+  <img src="logo.svg" alt="Abng News CMS Logo" width="200">
 </p>
 
 # 📰 توزيعة الأخبار
