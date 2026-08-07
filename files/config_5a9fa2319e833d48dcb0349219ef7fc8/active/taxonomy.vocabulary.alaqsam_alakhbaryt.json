@@ -1,0 +1,9 @@
+{
+    "_config_name": "taxonomy.vocabulary.alaqsam_alakhbaryt",
+    "name": "الاقسام الاخبارية",
+    "machine_name": "alaqsam_alakhbaryt",
+    "description": "من هذا الحقل الخاص بالاقسام لابد من اختيار قسم منها وتحري الدقة باختيارها",
+    "hierarchy": "0",
+    "language": 0,
+    "weight": 0
+}

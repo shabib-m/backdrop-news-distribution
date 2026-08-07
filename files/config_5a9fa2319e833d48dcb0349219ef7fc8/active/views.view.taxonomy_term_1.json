@@ -1,0 +1,448 @@
+{
+    "_config_name": "views.view.taxonomy_term_1",
+    "name": "taxonomy_term_1",
+    "description": "A view to emulate Backdrop core's handling of taxonomy/term.",
+    "module": "taxonomy",
+    "storage": 2,
+    "tag": "",
+    "disabled": false,
+    "base_table": "node",
+    "human_name": "صفحه الاقسام",
+    "core": 7,
+    "display": {
+        "default": {
+            "display_title": "Default",
+            "display_plugin": "default",
+            "display_options": {
+                "query": {
+                    "type": "views_query",
+                    "options": {
+                        "query_comment": false
+                    }
+                },
+                "access": {
+                    "type": "perm",
+                    "perm": "access content"
+                },
+                "cache": {
+                    "type": "none"
+                },
+                "exposed_form": {
+                    "type": "basic"
+                },
+                "pager": {
+                    "type": "full",
+                    "options": {
+                        "items_per_page": "12",
+                        "offset": "0",
+                        "id": "0",
+                        "total_pages": "",
+                        "quantity": "9",
+                        "tags": {
+                            "first": "« الأولى",
+                            "previous": "‹ السابقة",
+                            "next": "التالية ›",
+                            "last": "الأخيرة »"
+                        },
+                        "expose": {
+                            "items_per_page": 0,
+                            "items_per_page_label": "Items per page",
+                            "items_per_page_options": "5, 10, 20, 40, 60",
+                            "items_per_page_options_all": 0,
+                            "items_per_page_options_all_label": "- الكل -",
+                            "offset": 0,
+                            "offset_label": "Offset"
+                        }
+                    }
+                },
+                "style_plugin": "grid",
+                "row_plugin": "fields",
+                "sorts": {
+                    "sticky": {
+                        "id": "sticky",
+                        "table": "node",
+                        "field": "sticky",
+                        "order": "DESC"
+                    },
+                    "created": {
+                        "id": "created",
+                        "table": "node",
+                        "field": "created",
+                        "order": "DESC"
+                    }
+                },
+                "arguments": {
+                    "term_node_tid_depth": {
+                        "id": "term_node_tid_depth",
+                        "table": "node",
+                        "field": "term_node_tid_depth",
+                        "default_action": "not found",
+                        "exception": {
+                            "title_enable": 1
+                        },
+                        "title_enable": 1,
+                        "title": "%1",
+                        "default_argument_type": "fixed",
+                        "summary": {
+                            "format": "default_summary"
+                        },
+                        "specify_validation": 1,
+                        "validate": {
+                            "type": "taxonomy_term"
+                        },
+                        "depth": "0",
+                        "break_phrase": 1
+                    },
+                    "term_node_tid_depth_modifier": {
+                        "id": "term_node_tid_depth_modifier",
+                        "table": "node",
+                        "field": "term_node_tid_depth_modifier",
+                        "exception": {
+                            "title_enable": 1
+                        },
+                        "default_argument_type": "fixed",
+                        "summary": {
+                            "format": "default_summary"
+                        },
+                        "specify_validation": 1
+                    }
+                },
+                "filters": {
+                    "status_extra": {
+                        "id": "status_extra",
+                        "table": "node",
+                        "field": "status_extra",
+                        "group": 0,
+                        "expose": {
+                            "operator": false
+                        }
+                    },
+                    "type": {
+                        "id": "type",
+                        "table": "node",
+                        "field": "type",
+                        "operator": "in",
+                        "value": {
+                            "news": "news"
+                        }
+                    }
+                },
+                "style_options": {
+                    "grouping": [],
+                    "row_class": "card bg-white dark:bg-slate-900 rounded-[1.5rem] shadow-md compact border border-[#d3d3d3] dark:border-slate-800 overflow-hidden",
+                    "default_row_class": 1,
+                    "row_class_special": 1,
+                    "columns": "3",
+                    "cell_min_width": {
+                        "width": "16",
+                        "unit": "rem"
+                    },
+                    "grid_gutter": {
+                        "width": "2",
+                        "unit": "rem"
+                    },
+                    "alignment": "horizontal",
+                    "unresponsive": 0,
+                    "deprecated_table": 0,
+                    "fill_single_line": 1,
+                    "caption": "",
+                    "summary": ""
+                },
+                "row_options": {
+                    "default_field_elements": 1,
+                    "inline": [],
+                    "separator": "",
+                    "hide_empty": 0
+                },
+                "fields": {
+                    "field_swrt_alkhbr_alryysyt": {
+                        "id": "field_swrt_alkhbr_alryysyt",
+                        "table": "field_data_field_swrt_alkhbr_alryysyt",
+                        "field": "field_swrt_alkhbr_alryysyt",
+                        "relationship": "none",
+                        "group_type": "group",
+                        "ui_name": "",
+                        "label": "",
+                        "exclude": 0,
+                        "alter": {
+                            "alter_text": 0,
+                            "text": "",
+                            "make_link": 0,
+                            "path": "",
+                            "absolute": 0,
+                            "external": 0,
+                            "replace_spaces": 0,
+                            "path_case": "none",
+                            "trim_whitespace": 0,
+                            "alt": "",
+                            "rel": "",
+                            "link_class": "",
+                            "prefix": "",
+                            "suffix": "",
+                            "target": "",
+                            "nl2br": 0,
+                            "max_length": "",
+                            "word_boundary": 1,
+                            "ellipsis": 1,
+                            "more_link": 0,
+                            "more_link_text": "",
+                            "more_link_path": "",
+                            "strip_tags": 0,
+                            "trim": 0,
+                            "preserve_tags": "",
+                            "html": 0
+                        },
+                        "element_type": "",
+                        "element_class": "",
+                        "element_label_type": "",
+                        "element_label_class": "",
+                        "element_label_colon": false,
+                        "element_wrapper_type": "",
+                        "element_wrapper_class": "",
+                        "element_default_classes": 1,
+                        "empty": "",
+                        "hide_empty": 0,
+                        "empty_zero": 0,
+                        "hide_alter_empty": 1,
+                        "click_sort_column": "fid",
+                        "type": "image",
+                        "settings": {
+                            "image_style": "medium",
+                            "image_link": "",
+                            "image_float": "",
+                            "image_load": "auto"
+                        },
+                        "group_column": "",
+                        "group_columns": [],
+                        "group_rows": true,
+                        "delta_limit": "all",
+                        "delta_offset": 0,
+                        "delta_reversed": false,
+                        "delta_first_last": false,
+                        "multi_type": "separator",
+                        "separator": ", ",
+                        "field_api_classes": 0
+                    },
+                    "field_image": {
+                        "id": "field_image",
+                        "table": "field_data_field_image",
+                        "field": "field_image",
+                        "relationship": "none",
+                        "group_type": "group",
+                        "ui_name": "",
+                        "label": "",
+                        "exclude": 1,
+                        "alter": {
+                            "alter_text": 0,
+                            "text": "",
+                            "make_link": 0,
+                            "path": "",
+                            "absolute": 0,
+                            "external": 0,
+                            "replace_spaces": 0,
+                            "path_case": "none",
+                            "trim_whitespace": 0,
+                            "alt": "",
+                            "rel": "",
+                            "link_class": "",
+                            "prefix": "",
+                            "suffix": "",
+                            "target": "",
+                            "nl2br": 0,
+                            "max_length": "",
+                            "word_boundary": 1,
+                            "ellipsis": 1,
+                            "more_link": 0,
+                            "more_link_text": "",
+                            "more_link_path": "",
+                            "strip_tags": 0,
+                            "trim": 0,
+                            "preserve_tags": "",
+                            "html": 0
+                        },
+                        "element_type": "",
+                        "element_class": "",
+                        "element_label_type": "",
+                        "element_label_class": "",
+                        "element_label_colon": false,
+                        "element_wrapper_type": "",
+                        "element_wrapper_class": "",
+                        "element_default_classes": 1,
+                        "empty": "",
+                        "hide_empty": 0,
+                        "empty_zero": 0,
+                        "hide_alter_empty": 1,
+                        "click_sort_column": "fid",
+                        "type": "image",
+                        "settings": {
+                            "image_style": "medium",
+                            "image_link": "",
+                            "image_float": "",
+                            "image_load": "auto"
+                        },
+                        "group_column": "",
+                        "group_columns": [],
+                        "group_rows": true,
+                        "delta_limit": "all",
+                        "delta_offset": 0,
+                        "delta_reversed": false,
+                        "delta_first_last": false,
+                        "multi_type": "separator",
+                        "separator": ", ",
+                        "field_api_classes": 0
+                    },
+                    "title": {
+                        "id": "title",
+                        "table": "node",
+                        "field": "title",
+                        "relationship": "none",
+                        "group_type": "group",
+                        "ui_name": "",
+                        "label": "",
+                        "exclude": 0,
+                        "alter": {
+                            "alter_text": 0,
+                            "text": "",
+                            "make_link": 0,
+                            "path": "",
+                            "absolute": 0,
+                            "external": 0,
+                            "replace_spaces": 0,
+                            "path_case": "none",
+                            "trim_whitespace": 0,
+                            "alt": "",
+                            "rel": "",
+                            "link_class": "",
+                            "prefix": "",
+                            "suffix": "",
+                            "target": "",
+                            "nl2br": 0,
+                            "max_length": "30",
+                            "word_boundary": 1,
+                            "ellipsis": 1,
+                            "more_link": 0,
+                            "more_link_text": "",
+                            "more_link_path": "",
+                            "strip_tags": 0,
+                            "trim": 1,
+                            "preserve_tags": "",
+                            "html": 0
+                        },
+                        "element_type": "",
+                        "element_class": "",
+                        "element_label_type": "",
+                        "element_label_class": "",
+                        "element_label_colon": false,
+                        "element_wrapper_type": "",
+                        "element_wrapper_class": "",
+                        "element_default_classes": 1,
+                        "empty": "",
+                        "hide_empty": 0,
+                        "empty_zero": 0,
+                        "hide_alter_empty": 1,
+                        "link_to_node": 1
+                    },
+                    "body": {
+                        "id": "body",
+                        "table": "field_data_body",
+                        "field": "body",
+                        "relationship": "none",
+                        "group_type": "group",
+                        "ui_name": "",
+                        "label": "",
+                        "exclude": 0,
+                        "alter": {
+                            "alter_text": 0,
+                            "text": "",
+                            "make_link": 0,
+                            "path": "",
+                            "absolute": 0,
+                            "external": 0,
+                            "replace_spaces": 0,
+                            "path_case": "none",
+                            "trim_whitespace": 0,
+                            "alt": "",
+                            "rel": "",
+                            "link_class": "",
+                            "prefix": "",
+                            "suffix": "",
+                            "target": "",
+                            "nl2br": 0,
+                            "max_length": "",
+                            "word_boundary": 1,
+                            "ellipsis": 1,
+                            "more_link": 0,
+                            "more_link_text": "",
+                            "more_link_path": "",
+                            "strip_tags": 0,
+                            "trim": 0,
+                            "preserve_tags": "",
+                            "html": 0
+                        },
+                        "element_type": "",
+                        "element_class": "",
+                        "element_label_type": "",
+                        "element_label_class": "",
+                        "element_label_colon": false,
+                        "element_wrapper_type": "",
+                        "element_wrapper_class": "",
+                        "element_default_classes": 1,
+                        "empty": "",
+                        "hide_empty": 0,
+                        "empty_zero": 0,
+                        "hide_alter_empty": 1,
+                        "click_sort_column": "value",
+                        "type": "text_trimmed",
+                        "settings": {
+                            "trim_length": "300"
+                        },
+                        "group_column": "value",
+                        "group_columns": [],
+                        "group_rows": true,
+                        "delta_limit": "all",
+                        "delta_offset": 0,
+                        "delta_reversed": false,
+                        "delta_first_last": false,
+                        "multi_type": "separator",
+                        "separator": ", ",
+                        "field_api_classes": 0
+                    }
+                }
+            }
+        },
+        "page": {
+            "display_title": "Page",
+            "display_plugin": "page",
+            "display_options": {
+                "query": {
+                    "type": "views_query",
+                    "options": []
+                },
+                "path": "taxonomy/term/%"
+            }
+        },
+        "feed": {
+            "display_title": "Feed",
+            "display_plugin": "feed",
+            "display_options": {
+                "query": {
+                    "type": "views_query",
+                    "options": []
+                },
+                "pager": {
+                    "type": "full",
+                    "options": {
+                        "items_per_page": 15
+                    }
+                },
+                "style_plugin": "rss",
+                "row_plugin": "node_rss",
+                "path": "taxonomy/term/%/%/feed",
+                "displays": {
+                    "page": "page",
+                    "default": 0
+                }
+            }
+        }
+    }
+}

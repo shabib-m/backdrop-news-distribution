@@ -1,0 +1,52 @@
+{
+    "_config_name": "field.instance.node.news.field_news_gallery",
+    "field_name": "field_news_gallery",
+    "entity_type": "node",
+    "bundle": "news",
+    "label": "ألبوم صور الخبر",
+    "widget": {
+        "weight": "5",
+        "type": "image_image",
+        "module": "image",
+        "active": 1,
+        "settings": {
+            "progress_indicator": "throbber",
+            "browser_view": "image_library",
+            "preview_image_style": "thumbnail",
+            "inline_fields_option": "0",
+            "inline_fields": []
+        }
+    },
+    "description": "",
+    "required": 0,
+    "deleted": 0,
+    "default_value": null,
+    "default_value_function": null,
+    "settings": {
+        "file_directory": "field/news_gallery",
+        "file_extensions": "png gif jpg jpeg webp svg",
+        "max_filesize": "",
+        "max_dimensions": "",
+        "min_dimensions": "",
+        "alt_field": 1,
+        "alt_field_required": 0,
+        "title_field": 0,
+        "orientate": 0,
+        "default_image": "",
+        "user_register_form": false
+    },
+    "display": {
+        "default": {
+            "label": "hidden",
+            "type": "image",
+            "weight": "3",
+            "settings": {
+                "image_style": "medium",
+                "image_link": "",
+                "image_float": "",
+                "image_load": "auto"
+            },
+            "module": "image"
+        }
+    }
+}
