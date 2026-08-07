@@ -60,12 +60,14 @@
                     "title": "",
                     "style": "default",
                     "block_settings": {
-                        "menu": "user-menu",
+                        "menu": "",
                         "logo": 1,
                         "site_name": 1,
                         "site_slogan": 1
                     },
-                    "contexts": []
+                    "contexts": [],
+                    "admin_label": "",
+                    "admin_description": ""
                 },
                 "uuid": "84c43df4-1165-4faf-8700-c362a7153c0b",
                 "style": {

@@ -38,6 +38,12 @@
         "field_ui": true,
         "views_ui": true,
         "menu_attributes": true,
+        "custom_breadcrumbs": true,
+        "custom_breadcrumbs_identifiers": true,
+        "custom_breadcrumbs_paths": true,
+        "custom_breadcrumbs_taxonomy": true,
+        "custom_breadcrumbs_views": true,
+        "custom_breadcrumbsapi": true,
         "abng_news": true,
         "language": true,
         "locale": true

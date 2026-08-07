@@ -13,6 +13,8 @@
         "skip comment approval",
         "edit own comments",
         "synchronize configuration",
+        "administer custom breadcrumbs",
+        "use php in custom breadcrumbs",
         "access dashboard",
         "administer dashboard",
         "administer fields",
