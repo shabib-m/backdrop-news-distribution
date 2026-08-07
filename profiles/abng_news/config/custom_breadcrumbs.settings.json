@@ -24,7 +24,7 @@
     "custom_breadcrumbs_taxonomy_show_vocabulary": 0,
     "custom_breadcrumbs_taxonomy_show_current_term": 1,
     "custom_breadcrumbs_taxonomy_show_current_term_term": 0,
-    "custom_breadcrumbs_taxonomy_include_node_title": 0,
+    "custom_breadcrumbs_taxonomy_include_node_title": 1,
     "custom_breadcrumbs_taxonomy_session": 0,
     "custom_breadcrumbs_taxonomy_no_anon_sessions": 0,
     "custom_breadcrumbs_taxonomy_uncache": 0,
@@ -33,10 +33,13 @@
     "custom_breadcrumbs_taxonomy_include_nodes": "0",
     "custom_breadcrumbs_taxonomy_node_types": {
         "card": 0,
+        "news": 0,
         "page": 0,
         "post": 0
     },
     "custom_breadcrumbs_taxonomy_excluded_vocabs": {
+        "alaqsam_alakhbaryt": 0,
+        "almsadr_wkalat_alanba": 0,
         "tags": 0
     },
     "custom_breadcrumbs_none_span": 0,

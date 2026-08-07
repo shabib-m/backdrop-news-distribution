@@ -35,6 +35,12 @@ dependencies[] = update
 dependencies[] = views
 dependencies[] = views_ui
 dependencies[] = menu_attributes
+dependencies[] = custom_breadcrumbs
+dependencies[] = custom_breadcrumbs_identifiers
+dependencies[] = custom_breadcrumbs_paths
+dependencies[] = custom_breadcrumbs_taxonomy
+dependencies[] = custom_breadcrumbs_views
+dependencies[] = custom_breadcrumbsapi
 
 
 distribution_name = توزيعة الاخبار

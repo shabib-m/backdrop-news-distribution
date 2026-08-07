@@ -4,7 +4,6 @@
     "name": "default",
     "title": "Default Layout",
     "description": null,
-    "renderer_name": "standard",
     "module": "layout",
     "weight": 0,
     "storage": 2,
@@ -46,8 +45,6 @@
         ],
         "title": []
     },
-    "contexts": [],
-    "relationships": [],
     "content": {
         "84c43df4-1165-4faf-8700-c362a7153c0b": {
             "plugin": "system:header",
@@ -476,5 +473,8 @@
                 }
             }
         }
-    }
+    },
+    "renderer_name": "standard",
+    "contexts": [],
+    "relationships": []
 }

@@ -262,55 +262,49 @@ function abng_news_import_default_menus() {
     // مسح شامل لكاش الحقول والمحتوى لضمان ظهور الأقسام والصور فوراً دون تدخل يدوي
     cache_clear_all('*', 'cache_field', TRUE);
     entity_get_controller('node')->resetCache();
-  }
-  // abng_news_layout_load_alter();
-  // 1. إعادة بناء وتحديث كاش الأنساق بالكامل (ويشمل الصناديق بداخلها)
-  layout_reset_caches();
 
-  // 2. مسح كاش الحواشي والقوالب لفرض قراءة الكلاسات الديناميكية الجديدة
-  cache_clear_all('*', 'cache_block', TRUE);
-  cache_clear_all('theme_registry', 'cache');
+    abng_news_force_default_layout_config();
+  }
+
+  
 }
 
-
 /**
- * Implements hook_layout_load_alter().
- * دالة لاعتراض الأنساق المستوردة وفرض الكلاسات المخصصة للصناديق من ملف JSON.
+ * دالة قسرية لفرض تعديلات الأنساق والصناديق وتطهير قاعدة البيانات فور التثبيت.
  */
-/**
- * Implements hook_layout_load_alter().
- * دالة برمجية آمنة لحقن كلاسات الصناديق دون كسرها أو إخفائها في Backdrop CMS.
- */
-function abng_news_layout_load_alter(&$layout) {
-  if (!empty($layout->content)) {
-    foreach ($layout->content as $uuid => $block) {
-      // 1. التحقق الآمن من أن الصندوق يمتلك إعدادات نمط مخصصة (Style)
-      if (isset($block->style) && is_object($block->style)) {
-        
-        // جلب الإعدادات الداخلية للنمط المخصص
-        $style_settings = $block->style->settings;
 
-        // 2. التحقق من وجود الكلاسات المحددة في ملف الـ JSON المصدّر
-        if (!empty($style_settings['classes'])) {
-          $classes_input = $style_settings['classes'];
+function abng_news_force_default_layout_config() {
+  $profile_path = backdrop_get_path('profile', 'abng_news');
+  $json_file_path = $profile_path . '/config/layout.layout.default.json';
 
-          // تحويل النص إلى مصفوفة إذا كُتبت الكلاسات متبوعة بمسافات
-          $classes_array = is_array($classes_input) ? $classes_input : explode(' ', $classes_input);
+  if (file_exists($json_file_path)) {
+    $json_content = file_get_contents($json_file_path);
+    $layout_data = json_decode($json_content, TRUE);
 
-          // 3. حقن الكلاسات داخل المصفوفة الرسمية التي يتعرف عليها المحرك المرجعي للنسق
-          if (!isset($layout->content[$uuid]->style->settings['classes'])) {
-            $layout->content[$uuid]->style->settings['classes'] = array();
-          }
-
-          // دمج الكلاسات ومنع تكرارها لضمان استقرار التصميم
-          $layout->content[$uuid]->style->settings['classes'] = array_unique(
-            array_merge($layout->content[$uuid]->style->settings['classes'], $classes_array)
-          );
-        }
+    if (!empty($layout_data)) {
+      // 1. فتح نظام إعدادات النسق الافتراضي القياسي للنظام
+      $config = config('layout.layout.default');
+      
+      // 2. دمج وفرض كامل البيانات والمكونات المجلوبة من ملف الـ JSON الخاص بتوزيعتك
+      foreach ($layout_data as $key => $value) {
+        $config->set($key, $value);
       }
+      
+      // 3. حفظ التعديلات نهائياً وتفعيلها
+      $config->save();
+      
+      // 4. [البديل الصحيح]: تفريغ ومسح الكاش العميق للأنساق لفرض إعادة البناء والتحديث
+      layout_reset_caches();
+      cache_clear_all('*', 'cache_layout', TRUE);
+      cache_clear_all('*', 'cache_block', TRUE);
+      
+      // إنعاش السجل لتحديث القوالب ومسارات ظهور الصناديق فوراً
+      cache_clear_all('theme_registry', 'cache');
     }
   }
 }
+
+
 
 
 
