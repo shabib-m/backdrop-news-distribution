@@ -15,10 +15,10 @@
  * See the documentation at https://docs.backdropcms.org/database-configuration
  */
 $database = array(
-  'database' => 'my-new',
-  'username' => 'root',
-  'password' => '',
-  'host' => '127.0.0.1',
+  'database' => 'database_name',
+  'username' => 'user',
+  'password' => 'pass',
+  'host' => 'localhost',
 );
 
 /**
@@ -58,8 +58,8 @@ $database = array(
  * $config_directories['staging'] = '/home/myusername/config/staging';
  * @endcode
  */
-$config_directories['active'] = './files/config_5a9fa2319e833d48dcb0349219ef7fc8/active';
-$config_directories['staging'] = './files/config_5a9fa2319e833d48dcb0349219ef7fc8/staging';
+$config_directories['active'] = 'files/config_' . md5(serialize($database)) . '/active';
+$config_directories['staging'] = 'files/config_' . md5(serialize($database)) . '/staging';
 
 /**
  * Skip the configuration staging directory cleanup
@@ -113,7 +113,7 @@ $settings['restore_free_access'] = FALSE;
  * This can also be set to a value of FALSE to disable the backup capability,
  * for sites that have an alternative backup mechanism in place.
  */
-$settings['backup_directory'] = 'files/backups_e6310c529a50e7e5e48cc9147569f8d0';
+$settings['backup_directory'] = '';
 
 /**
  * Salt for one-time login links and cancel links, form tokens, etc.
@@ -133,7 +133,7 @@ $settings['backup_directory'] = 'files/backups_e6310c529a50e7e5e48cc9147569f8d0'
  * $settings['hash_salt'] = file_get_contents('/home/example/salt.txt');
  * @endcode
  */
-$settings['hash_salt'] = 'SGYAqKBbuE7cOoOFmw-lMgd7NydaFBXcP9VT6J3H364';
+$settings['hash_salt'] = '';
 
 /**
  * Trusted host configuration (optional but highly recommended).
